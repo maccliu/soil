@@ -1,0 +1,16 @@
+{
+  "name": "maccliu/soil",
+  "description": "Soil: An underlying PHP framework, under the MIT license.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Macc Liu",
+      "email": "mail@maccliu.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.4.0"
+  }
+}
