@@ -20,7 +20,7 @@ Soil requires PHP 5.4 or greater.
 
 ### 1. Composer
 
-The quickest way to import this library is to use [Composer](https://getcomposer.org/):
+The quickest way to import this library is via [Composer](https://getcomposer.org/):
 
 ```
 composer require maccliu/soil

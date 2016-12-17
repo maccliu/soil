@@ -25,7 +25,6 @@ class Settings implements \ArrayAccess
     {
         foreach ($items as $key => $value) {
             if (!is_string($key)) {
-
                 throw new \InvalidArgumentException(
                 'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
                 'key MUST be string.'
