@@ -13,6 +13,7 @@ namespace Soil;
 /**
  * Container容器对象类
  *
+ * @author Macc Liu <mail@maccliu.com>
  */
 class Container implements \ArrayAccess
 {
