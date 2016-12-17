@@ -109,11 +109,7 @@ class Container implements \ArrayAccess
      */
     public function remove($key)
     {
-        unset($this->_keys[$key],
-              $this->_parameters[$key],
-              $this->_classnames[$key],
-              $this->_closures,
-              $this->_instances[$key]);
+        unset($this->_keys[$key], $this->_parameters[$key], $this->_classnames[$key], $this->_closures, $this->_instances[$key]);
     }
 
 
@@ -356,24 +352,18 @@ class Container implements \ArrayAccess
         // 检查开始字符是数字或者结尾字符是\
         $result = preg_match('/^\\d/', $class, $matches);
         if ($result > 0) {
-            print_r('1 ');
-            print_r($matches);
             return false;
         }
 
         // 检查存在非单词字符
         $result = preg_match('/[^\w\\\]/', $class, $matches);
         if ($result > 0) {
-            print_r('2 ');
-            print_r($matches);
             return false;
         }
 
         // 检查 \数字 这种形式的错误
         $result = preg_match('/(\\\\\d)/', $class, $matches);
         if ($result > 0) {
-            print_r('3 ');
-            print_r($matches);
             return false;
         }
 
