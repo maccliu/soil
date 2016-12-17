@@ -3,6 +3,7 @@
   "description": "Soil: An underlying PHP framework, under the MIT license.",
   "type": "library",
   "license": "MIT",
+  "homepage": "https://github.com/maccliu/soil",
   "authors": [
     {
       "name": "Macc Liu",
@@ -12,5 +13,10 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Soil\\": "src/"
+    }
   }
 }
