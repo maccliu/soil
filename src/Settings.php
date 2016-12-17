@@ -38,6 +38,17 @@ class Settings implements \ArrayAccess
 
 
     /**
+     * Retrieves all keys
+     * @return array
+     */
+    public function keys()
+    {
+        $this->sortKeys();
+        return array_keys($this->items);
+    }
+
+
+    /**
      * Checks if a setting is set.
      *
      * @param string $key The setting key
@@ -170,7 +181,7 @@ class Settings implements \ArrayAccess
         if (!is_string($group) || ($group === '')) {
             throw new \InvalidArgumentException(
             'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-            'group MUST be string.'
+            'group MUST be string and NOT a null string.'
             );
         }
 
