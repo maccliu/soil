@@ -220,39 +220,41 @@ class Settings implements \ArrayAccess
 
 
     /**
-     * Imports from a setting file.
+     * Reads a setting file.
      *
      * @param string $filepath
      * @param string $group
      *
-     * @return bool
+     * @return array Returns the settings array if OK.
      */
-    public static function importSettingFile($filepath, $group = '')
+    public static function readSettingFile($filepath, $group = '')
     {
-        $items = function () use ($filepath) {
+        $require =  function () use ($filepath) {
             if (file_exists($filepath)) {
-                require ($filepath);
+                return require($filepath);
             } else {
                 return [];
             }
         };
+        $items = $require();
+
         if (empty($items)) {
-            return true;
+            return [];
         }
 
         if (!is_string($group)) {
-            return false;
+            return [];
         } elseif ($group === '') {
             $groupname = '';
         } else {
             $groupname = $group . '.';
         }
 
+        $return = [];
         foreach ($items as $key => $value) {
-            $this->checkKey($key);
-            $this->set($groupname . $key, $value);
+            $return[$groupname . $key] = $value;
         }
-        return true;
+        return $return;
     }
 
 
