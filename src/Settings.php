@@ -85,16 +85,11 @@ class Settings implements \ArrayAccess
      *
      * @param string $key   The setting key
      *
-     * @return mixed Return the setting if found.
-     * @return null Return null if not exist.
+     * @return mixed
      */
-    public function get($key)
+    public function get($key, $default = null)
     {
-        if ($this->has($key)) {
-            return $this->items[$key];
-        } else {
-            return null;
-        }
+        return $this->has($key) ? $this->items[$key] : $default;
     }
 
 
