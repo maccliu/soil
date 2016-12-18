@@ -9,7 +9,6 @@
 
 namespace Soil;
 
-
 class Settings implements \ArrayAccess
 {
     protected $items = [];

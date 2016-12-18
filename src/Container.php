@@ -6,9 +6,7 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-
 namespace Soil;
-
 
 /**
  * Container容器对象类
