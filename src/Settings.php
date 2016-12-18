@@ -6,7 +6,6 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-
 namespace Soil;
 
 class Settings implements \ArrayAccess
@@ -23,12 +22,7 @@ class Settings implements \ArrayAccess
     public function __construct(array $items = [])
     {
         foreach ($items as $key => $value) {
-            if (!is_string($key)) {
-                throw new \InvalidArgumentException(
-                'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-                'key MUST be string.'
-                );
-            }
+            $this->checkKey($key);
         }
 
         $this->items = $items;
@@ -41,7 +35,6 @@ class Settings implements \ArrayAccess
      */
     public function keys()
     {
-        $this->sortKeys();
         return array_keys($this->items);
     }
 
@@ -69,13 +62,7 @@ class Settings implements \ArrayAccess
      */
     public function set($key, $value)
     {
-        if (!is_string($group) || ($group === '')) {
-            throw new \InvalidArgumentException(
-            'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-            'key MUST be string.'
-            );
-        }
-
+        $this->checkKey($key);
         $this->items[$key] = $value;
     }
 
@@ -83,7 +70,7 @@ class Settings implements \ArrayAccess
     /**
      * Gets a setting.
      *
-     * @param string $key   The setting key
+     * @param string $key The setting key
      *
      * @return mixed
      */
@@ -100,9 +87,7 @@ class Settings implements \ArrayAccess
      */
     public function remove($key)
     {
-        if ($this->exists($key)) {
-            unset($this->items[$key]);
-        }
+        unset($this->items[$key]);
     }
 
 
@@ -114,46 +99,25 @@ class Settings implements \ArrayAccess
      *
      * @param string $group Group name
      *
-     * @return array Settings array found, order by their keys.
-     * @return array [] if not found any one.
+     * @return array Settings array found, order by their keys. Return [] if not found.
      */
-    public function getGroupItems($group)
+    public function getItemsByGroup($group)
     {
-        if (!is_string($group) || ($group === '')) {
-            throw new \InvalidArgumentException(
-            'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-            'group MUST be string.'
-            );
-        }
+        $this->checkGroup($group);
 
-        /*
-         * Sort the keys first
-         */
-        ksort($this->items);
-
-        /*
-         * searching
-         */
         $find = $group . '.';
         $len = mb_strlen($find);
-        $return = [];
-        $found = false;
 
-        foreach ($this->items as $key => $value) {
+        // first, filters all keys include 'group.'
+        $keys = array_keys($this->items, $find, true);
+
+        // checks one by one, finds starts with 'group.'
+        $return = [];
+        foreach ($keys as $key) {
             if (strncasecmp($find, $key, $len) === 0) {
-                /*
-                 * Found one
-                 */
-                $return[$key] = $value;
-                $found = true;
-            } elseif ($found == true) {
-                /*
-                 * Because we had sorted the array keys.
-                 */
-                break;
+                $return[$key] = $this->items[$key];
             }
         }
-
         return $return;
     }
 
@@ -171,18 +135,12 @@ class Settings implements \ArrayAccess
      */
     public function setGroup($group, array $items)
     {
-        if (!is_string($group) || ($group === '')) {
-            throw new \InvalidArgumentException(
-            'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-            'group MUST be string and NOT a null string.'
-            );
-        }
+
+        $this->checkgroup($group);
 
         foreach ($items as $key => $value) {
             $this->items[$group . '.' . $key] = $value;
         }
-
-        ksort($this->items);
     }
 
 
@@ -195,21 +153,14 @@ class Settings implements \ArrayAccess
      */
     public function getGroup($group)
     {
-        if (!is_string($group) || ($group === '')) {
-            throw new \InvalidArgumentException(
-            'Invalid argument type in ' . __NAMESPACE__ . '\\' . __CLASS__ . '->' . __METHOD__ . '():' .
-            'group MUST be string.'
-            );
-        }
+
+        $this->checkGroup($group);
 
         $return = [];
+        $items = $this->getItemsByGroup($group);
 
-        $items = $this->getGroupItems($group);
-
+        // remove "group." from the key name
         foreach ($items as $key => $value) {
-            /*
-             * remove "groupname." from the key name
-             */
             $newkey = mb_substr($key, mb_strlen($group) + 1);
             $return[$newkey] = $value;
         }
@@ -225,10 +176,34 @@ class Settings implements \ArrayAccess
      */
     public function removeGroup($group)
     {
-        $items = $this->getGroupItems($group);
+        $items = $this->getItemsByGroup($group);
 
         foreach ($items as $key => $value) {
             unset($this->items[$key]);
+        }
+    }
+
+
+    /**
+     * Batch set.
+     *
+     * @param array $userSettings 用户设置
+     * @param array $defaultSettings 默认设置
+     */
+    public function batchSet(array $userSettings, array $defaultSettings = [])
+    {
+        // process $defaultSettings
+        foreach ($defaultSettings as $key => $value) {
+            if (!$this->exists($key)) {
+                $this->checkKey($key);
+                $this->set($key, $value);
+            }
+        }
+
+        // process $userSettings
+        foreach ($userSettings as $key => $value) {
+            $this->checkKey($key);
+            $this->set($key, $value);
         }
     }
 
@@ -241,6 +216,71 @@ class Settings implements \ArrayAccess
     public function sortKeys()
     {
         ksort($this->items);
+    }
+
+
+    /**
+     * Imports from a setting file.
+     *
+     * @param string $filepath
+     * @param string $group
+     *
+     * @return bool
+     */
+    public static function importSettingFile($filepath, $group = '')
+    {
+        $items = function () use ($filepath) {
+            if (file_exists($filepath)) {
+                require ($filepath);
+            } else {
+                return [];
+            }
+        };
+        if (empty($items)) {
+            return true;
+        }
+
+        if (!is_string($group)) {
+            return false;
+        } elseif ($group === '') {
+            $groupname = '';
+        } else {
+            $groupname = $group . '.';
+        }
+
+        foreach ($items as $key => $value) {
+            $this->checkKey($key);
+            $this->set($groupname . $key, $value);
+        }
+        return true;
+    }
+
+
+    /**
+     * Checks the $key type is string and not a null string.
+     *
+     * @param string $key
+     * @throws \InvalidArgumentException
+     */
+    private function checkKey($key)
+    {
+        if (!is_string($key) || ($key === '')) {
+            throw new \InvalidArgumentException('Invalid key name.');
+        }
+    }
+
+
+    /**
+     * Checks the $group type is string and not a null string.
+     *
+     * @param string $group
+     * @throws \InvalidArgumentException
+     */
+    private function checkGroup($group)
+    {
+        if (!is_string($group) || ($group === '')) {
+            throw new \InvalidArgumentException('Invalid group name.');
+        }
     }
 
 
