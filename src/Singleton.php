@@ -9,10 +9,9 @@
 namespace Soil;
 
 /**
- * 单例化
+ * Singleton
  *
- * 只能用 $bar=Foo::getInstance() 取得实例，不能用 new 或 clone
- * @see https://github.com/maccliu/handbook/tree/master/php
+ * @author Macc Liu <mail@maccliu.com>
  */
 class Singleton
 {

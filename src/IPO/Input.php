@@ -8,7 +8,12 @@
 
 namespace Soil\IPO;
 
-class Process extends IPO
+/**
+ * Input
+ *
+ * @author Macc Liu <mail@maccliu.com>
+ */
+class Input extends IPO
 {
 
 }

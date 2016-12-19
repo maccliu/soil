@@ -8,6 +8,11 @@
 
 namespace Soil;
 
+/**
+ * Settings
+ *
+ * @author Macc Liu <mail@maccliu.com>
+ */
 class Settings implements \ArrayAccess
 {
     protected $items = [];

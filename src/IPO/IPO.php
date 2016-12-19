@@ -8,6 +8,11 @@
 
 namespace Soil\IPO;
 
+/**
+ * IPO
+ *
+ * @author Macc Liu <mail@maccliu.com>
+ */
 class IPO
 {
     private $input = null;
