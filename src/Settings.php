@@ -227,9 +227,9 @@ class Settings implements \ArrayAccess
      *
      * @return array Returns the settings array if OK.
      */
-    public static function readSettingFile($filepath, $group = '')
+    public function readSettingFile($filepath, $group = '')
     {
-        $require =  function () use ($filepath) {
+        $require = function () use ($filepath) {
             if (file_exists($filepath)) {
                 return require($filepath);
             } else {
