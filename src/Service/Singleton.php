@@ -6,7 +6,7 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil;
+namespace Soil\Service;
 
 /**
  * Singleton
