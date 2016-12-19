@@ -9,7 +9,7 @@
 namespace Soil\Service;
 
 /**
- * ServiceFacade
+ * Facade
  *
  * @author Macc Liu <mail@maccliu.com>
  */
