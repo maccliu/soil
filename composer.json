@@ -7,12 +7,14 @@
   "authors": [
     {
       "name": "Macc Liu",
-      "email": "mail@maccliu.com"
+      "email": "mail@maccliu.com",
+      "homepage": "http://maccliu.com"
     }
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4.0",
+    "container-interop/container-interop": "^1.1"
   },
   "autoload": {
     "psr-4": {
