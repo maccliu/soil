@@ -6,7 +6,7 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil;
+namespace Soil\Common;
 
 /**
  * Settings
@@ -51,7 +51,7 @@ class Settings implements \ArrayAccess
      *
      * @return bool
      */
-    public function exists($key)
+    public function has($key)
     {
         return array_key_exists($key, $this->items);
     }
@@ -197,7 +197,7 @@ class Settings implements \ArrayAccess
     {
         // process $defaultSettings
         foreach ($defaultSettings as $key => $value) {
-            if (!$this->exists($key)) {
+            if (!$this->has($key)) {
                 $this->checkKey($key);
                 $this->set($key, $value);
             }
@@ -296,7 +296,7 @@ class Settings implements \ArrayAccess
      */
     public function offsetExists($key)
     {
-        return $this->exists($key);
+        return $this->has($key);
     }
 
 
