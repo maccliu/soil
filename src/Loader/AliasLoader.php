@@ -46,12 +46,10 @@ class AliasLoader implements AliasLoaderInterface
      */
     public function load($alias)
     {
-        if (!isset($this->_aliases[$alias])) {
-            throw new \InvalidArgumentException("未找到此别名:{$alias}");
+        if (isset($this->_aliases[$alias])) {
+            return class_alias($this->_aliases[$alias],
+                               $alias);
         }
-
-        $original = $this__aliases[$alias];
-        return class_alias($original, $alias);
     }
 
 
