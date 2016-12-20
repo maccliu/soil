@@ -20,7 +20,6 @@ class IPO
 
     public function setInput(IPO $input)
     {
-
     }
 
 

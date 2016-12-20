@@ -15,5 +15,4 @@ namespace Soil\IPO;
  */
 class Output extends IPO
 {
-
 }
