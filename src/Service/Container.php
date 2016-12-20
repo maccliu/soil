@@ -30,7 +30,7 @@ class Container implements ArrayAccess, ContainerInterface
     /*
      * 所有登记过keys
      */
-    protected $_keys = [];
+    private $_keys = [];
 
     /*
      * 各种类型
@@ -43,7 +43,6 @@ class Container implements ArrayAccess, ContainerInterface
 
     public function __construct()
     {
-
     }
 
 
@@ -77,7 +76,8 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function offsetSet($id, $value)
     {
-        return $this->set($id, $value);
+        return $this->set($id,
+                          $value);
     }
 
 
@@ -111,7 +111,8 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function has($id)
     {
-        return array_key_exists($id, $this->_keys);
+        return array_key_exists($id,
+                                $this->_keys);
     }
 
 
@@ -145,7 +146,8 @@ class Container implements ArrayAccess, ContainerInterface
                     return $this->_instances[$id];
                 }
                 // 如果是第一次运行，则创建新服务实例，并保存备用
-                $obj = call_user_func_array($this->_closures[$id], $params);
+                $obj = call_user_func_array($this->_closures[$id],
+                                            $params);
                 $this->_instances[$id] = $obj;
                 return $obj;
 
@@ -196,7 +198,11 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function remove($id)
     {
-        unset($this->_keys[$id], $this->_parameters[$id], $this->_classnames[$id], $this->_closures, $this->_instances[$id]);
+        unset($this->_keys[$id],
+              $this->_parameters[$id],
+              $this->_classnames[$id],
+              $this->_closures,
+              $this->_instances[$id]);
     }
 
 
@@ -224,7 +230,8 @@ class Container implements ArrayAccess, ContainerInterface
                 return $this->_instances[$id];
 
             case self::CLOSURE_TYPE:
-                $obj = call_user_func_array($this->_closures[$id], $params);
+                $obj = call_user_func_array($this->_closures[$id],
+                                            $params);
                 return $obj;
 
             case self::CLASSNAME_TYPE:
@@ -310,19 +317,25 @@ class Container implements ArrayAccess, ContainerInterface
         $matches = '';
 
         // 检查开始字符是数字或者结尾字符是\
-        $result = preg_match('/^\\d/', $class, $matches);
+        $result = preg_match('/^\\d/',
+                             $class,
+                             $matches);
         if ($result > 0) {
             return false;
         }
 
         // 检查存在非单词字符
-        $result = preg_match('/[^\w\\\]/', $class, $matches);
+        $result = preg_match('/[^\w\\\]/',
+                             $class,
+                             $matches);
         if ($result > 0) {
             return false;
         }
 
         // 检查 \数字 这种形式的错误
-        $result = preg_match('/(\\\\\d)/', $class, $matches);
+        $result = preg_match('/(\\\\\d)/',
+                             $class,
+                             $matches);
         if ($result > 0) {
             return false;
         }
