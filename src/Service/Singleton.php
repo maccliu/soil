@@ -26,7 +26,6 @@ class Singleton
      */
     private function __construct()
     {
-
     }
 
 
@@ -35,7 +34,6 @@ class Singleton
      */
     private function __clone()
     {
-
     }
 
 

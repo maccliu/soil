@@ -140,7 +140,6 @@ class Settings implements \ArrayAccess
      */
     public function setGroup($group, array $items)
     {
-
         $this->checkgroup($group);
 
         foreach ($items as $key => $value) {
@@ -158,7 +157,6 @@ class Settings implements \ArrayAccess
      */
     public function getGroup($group)
     {
-
         $this->checkGroup($group);
 
         $return = [];

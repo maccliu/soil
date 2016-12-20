@@ -19,7 +19,7 @@ abstract class Provider
     protected $app = null;  // 指向app实例
 
 
-    abstract function register();
+    abstract public function register();
 
 
     public function __construct($app)

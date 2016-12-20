@@ -17,5 +17,4 @@ use Interop\Container\Exception\ContainerException;
  */
 class ContainerException extends \Exception implements ContainerException
 {
-
 }

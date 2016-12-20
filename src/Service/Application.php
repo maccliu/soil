@@ -41,6 +41,5 @@ class Application extends Container
      */
     public function registerServiceProvider($class, $accesspath = null)
     {
-
     }
 }
