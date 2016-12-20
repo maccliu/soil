@@ -13,6 +13,6 @@ namespace Soil\IPO;
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class Output extends IPO
+abstract class Output extends IPO
 {
 }

@@ -13,7 +13,7 @@ namespace Soil\IPO;
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class IPO
+abstract class IPO
 {
     private $input = null;
 
@@ -25,8 +25,6 @@ class IPO
 
     public function process()
     {
-        $output = new IPO;
-        return $output;
     }
 }
 
