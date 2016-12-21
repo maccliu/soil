@@ -107,7 +107,7 @@ class Container implements ArrayAccess, ContainerInterface
      * 是否已经注册此id。
      *
      * @param string $id
-     * @return boolean
+     * @return bool
      */
     public function has($id)
     {
@@ -127,7 +127,7 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function get($id)
     {
-        if (!$this->exists($id)) {
+        if (!$this->has($id)) {
             throw new NotFoundException('未找到指定id');
         }
 
@@ -146,10 +146,10 @@ class Container implements ArrayAccess, ContainerInterface
                     return $this->_instances[$id];
                 }
                 // 如果是第一次运行，则创建新服务实例，并保存备用
-                $obj = call_user_func_array($this->_closures[$id],
+                $serviceInstance = call_user_func_array($this->_closures[$id],
                                             $params);
-                $this->_instances[$id] = $obj;
-                return $obj;
+                $this->_instances[$id] = $serviceInstance;
+                return $serviceInstance;
 
             case self::CLASSNAME_TYPE:
                 //如果服务实例以前已经创建，直接返回创建好的服务实例
@@ -161,9 +161,9 @@ class Container implements ArrayAccess, ContainerInterface
                 if (!$class->isInstantiable()) {
                     return null;
                 }
-                $obj = new $this->_classnames[$id];
-                $this->_instances[$id] = $obj;
-                return $obj;
+                $serviceInstance = new $this->_classnames[$id];
+                $this->_instances[$id] = $serviceInstance;
+                return $serviceInstance;
         } // switch
     }
 
@@ -214,7 +214,7 @@ class Container implements ArrayAccess, ContainerInterface
      * @return mixed
      * @throws NotFoundException
      */
-    public function make($id)
+    public function getNew($id)
     {
         if (!$this->exists($id)) {
             throw new NotFoundException('未找到指定id');
@@ -230,32 +230,32 @@ class Container implements ArrayAccess, ContainerInterface
                 return $this->_instances[$id];
 
             case self::CLOSURE_TYPE:
-                $obj = call_user_func_array($this->_closures[$id],
+                $serviceInstance = call_user_func_array($this->_closures[$id],
                                             $params);
-                return $obj;
+                return $serviceInstance;
 
             case self::CLASSNAME_TYPE:
                 $class = new \ReflectionClass($this->_classnames[$id]);
                 if (!$class->isInstantiable()) {
                     return null;
                 }
-                $obj = new $this->_classnames[$id];
-                return $obj;
+                $serviceInstance = new $this->_classnames[$id];
+                return $serviceInstance;
         } // switch
     }
 
 
     /**
-     * 注册一个对象条目
+     * 注册一个服务
      *
      * @param string $id
-     * @param mixed $class
+     * @param string|closure|object $service
      *
-     * @return boolean 成功返回true，失败返回false
+     * @return bool 成功返回true，失败返回false
      *
      * @throws ContainerException
      */
-    public function register($id, $class)
+    public function bind($id, $service)
     {
         $this->checkID($id);
 
@@ -263,19 +263,19 @@ class Container implements ArrayAccess, ContainerInterface
             $this->remove($id);
         }
 
-        if (is_string($class)) {
-            if (!$this->checkClassName($class)) {
+        if (is_string($service)) {
+            if (!$this->checkClassname($service)) {
                 throw new ContainerException('id必须为非空字符串');
             }
             $this->_keys[$id] = self::CLASSNAME_TYPE;
-            $this->_classnames[$id] = $class;
-        } elseif (is_object($class)) {
-            if ($class instanceof \Closure) {
+            $this->_classnames[$id] = $service;
+        } elseif (is_object($service)) {
+            if ($service instanceof \Closure) {
                 $this->_keys[$id] = self::CLOSURE_TYPE;
-                $this->_closures[$id] = $class;
+                $this->_closures[$id] = $service;
             } else {
                 $this->_keys[$id] = self::INSTANCE_TYPE;
-                $this->_instances[$id] = $class;
+                $this->_instances[$id] = $service;
             }
         } else {
             throw new ContainerException('传入的service类型不合法');
@@ -308,17 +308,17 @@ class Container implements ArrayAccess, ContainerInterface
      *
      * 用正则表达式检查只包含：字母，数字，_，\
      *
-     * @param string $class
+     * @param string $classname
      *
-     * @return boolean
+     * @return bool
      */
-    private function checkClassName($class)
+    private function checkClassname($classname)
     {
         $matches = '';
 
         // 检查开始字符是数字或者结尾字符是\
         $result = preg_match('/^\\d/',
-                             $class,
+                             $classname,
                              $matches);
         if ($result > 0) {
             return false;
@@ -326,7 +326,7 @@ class Container implements ArrayAccess, ContainerInterface
 
         // 检查存在非单词字符
         $result = preg_match('/[^\w\\\]/',
-                             $class,
+                             $classname,
                              $matches);
         if ($result > 0) {
             return false;
@@ -334,7 +334,7 @@ class Container implements ArrayAccess, ContainerInterface
 
         // 检查 \数字 这种形式的错误
         $result = preg_match('/(\\\\\d)/',
-                             $class,
+                             $classname,
                              $matches);
         if ($result > 0) {
             return false;
