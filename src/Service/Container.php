@@ -147,7 +147,7 @@ class Container implements ArrayAccess, ContainerInterface
                 }
                 // 如果是第一次运行，则创建新服务实例，并保存备用
                 $serviceInstance = call_user_func_array($this->_closures[$id],
-                                            $params);
+                                                        $params);
                 $this->_instances[$id] = $serviceInstance;
                 return $serviceInstance;
 
@@ -207,6 +207,28 @@ class Container implements ArrayAccess, ContainerInterface
 
 
     /**
+     * 删除某个由服务类名（或者闭包函数）生成的服务实例
+     *
+     * 执行本操作后，在下次get时，就会有重新有个新的服务实例生成。
+     *
+     * @param string $id
+     */
+    public function removeServiceInstance($id)
+    {
+        if (!$this->has($id) || !isset($this->_instances[$id])) {
+            return;
+        }
+
+        // 仅针对CLASSNAME_TYPE或者CLOSURE_TYPE生效
+        switch ($this->_keys[$id]) {
+            case self::CLASSNAME_TYPE:
+            case self::CLOSURE_TYPE:
+                unset($this->_instances[$id]);
+        }
+    }
+
+
+    /**
      * 返回一个新的服务实例
      *
      * @param string $id
@@ -231,7 +253,7 @@ class Container implements ArrayAccess, ContainerInterface
 
             case self::CLOSURE_TYPE:
                 $serviceInstance = call_user_func_array($this->_closures[$id],
-                                            $params);
+                                                        $params);
                 return $serviceInstance;
 
             case self::CLASSNAME_TYPE:
