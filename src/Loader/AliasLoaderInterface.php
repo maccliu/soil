@@ -21,11 +21,11 @@ interface AliasLoaderInterface
      * 新增一个类别名
      *
      * @param string $alias 别名
-     * @param string $original 想要的完整类名（含Namespace）
+     * @param string $linkto 要指向的实际类名（完整类名，包含Namespace）
      *
      * @throws \InvalidArgumentException 不可重复设置类的别名
      */
-    public function addAlias($alias, $original);
+    public function addAlias($alias, $linkto);
 
 
     /**
@@ -50,4 +50,10 @@ interface AliasLoaderInterface
      * @return bool
      */
     public function isRegistered();
+
+
+    /**
+     * 返回所有已登记的别名
+     */
+    public function getAliases();
 }

@@ -23,17 +23,17 @@ class AliasLoader implements AliasLoaderInterface
      * 新增一个类别名
      *
      * @param string $alias 别名
-     * @param string $original 想要的完整类名（含Namespace）
+     * @param string $linkto 要指向的实际类名（完整类名，包含Namespace）
      *
      * @throws \InvalidArgumentException 不可重复设置类的别名
      */
-    public function addAlias($alias, $original)
+    public function addAlias($alias, $linkto)
     {
         if (isset($this->_aliases[$alias])) {
             throw new \InvalidArgumentException("不可重复设置类别名:{$alias}");
         }
 
-        $this->_aliases[$alias] = $original;
+        $this->_aliases[$alias] = $linkto;
 
         return $this; // 可链式调用
     }
@@ -77,5 +77,14 @@ class AliasLoader implements AliasLoaderInterface
     public function isRegistered()
     {
         return $this->_registered;
+    }
+
+
+    /**
+     * 返回别名列表
+     */
+    public function getAliases()
+    {
+        return $this->_aliases;
     }
 }
