@@ -8,6 +8,8 @@
 
 namespace Soil;
 
+use Soil\Container;
+
 /**
  * Staticall
  *
@@ -22,9 +24,9 @@ abstract class Staticall
 
 
     /**
-     * Boots the Staticall
+     * Boots the Staticall mechanisms
      *
-     * @param Container $container
+     * @param Soil\Container $container
      */
     final public static function boot($container)
     {

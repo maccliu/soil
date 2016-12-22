@@ -6,7 +6,7 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil\Common;
+namespace Soil;
 
 /**
  * Settings
@@ -53,7 +53,8 @@ class Settings implements \ArrayAccess
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->items);
+        return array_key_exists($key,
+                                $this->items);
     }
 
 
@@ -114,12 +115,16 @@ class Settings implements \ArrayAccess
         $len = mb_strlen($find);
 
         // first, filters all keys include 'group.'
-        $keys = array_keys($this->items, $find, true);
+        $keys = array_keys($this->items,
+                           $find,
+                           true);
 
         // checks one by one, finds starts with 'group.'
         $return = [];
         foreach ($keys as $key) {
-            if (strncasecmp($find, $key, $len) === 0) {
+            if (strncasecmp($find,
+                            $key,
+                            $len) === 0) {
                 $return[$key] = $this->items[$key];
             }
         }
@@ -164,7 +169,8 @@ class Settings implements \ArrayAccess
 
         // remove "group." from the key name
         foreach ($items as $key => $value) {
-            $newkey = mb_substr($key, mb_strlen($group) + 1);
+            $newkey = mb_substr($key,
+                                mb_strlen($group) + 1);
             $return[$newkey] = $value;
         }
 
@@ -199,14 +205,16 @@ class Settings implements \ArrayAccess
         foreach ($defaultSettings as $key => $value) {
             if (!$this->has($key)) {
                 $this->checkKey($key);
-                $this->set($key, $value);
+                $this->set($key,
+                           $value);
             }
         }
 
         // process $userSettings
         foreach ($userSettings as $key => $value) {
             $this->checkKey($key);
-            $this->set($key, $value);
+            $this->set($key,
+                       $value);
         }
     }
 
@@ -306,7 +314,8 @@ class Settings implements \ArrayAccess
      */
     public function offsetSet($key, $value)
     {
-        $this->set($key, $value);
+        $this->set($key,
+                   $value);
     }
 
 

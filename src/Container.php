@@ -6,11 +6,13 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil\Service;
+namespace Soil;
 
 use ArrayAccess;
 use Interop\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
+
+use Soil\Container\ContainerException;
+use Soil\Container\NotFoundException;
 
 /**
  * Container
@@ -128,7 +130,7 @@ class Container implements ArrayAccess, ContainerInterface
     public function get($id)
     {
         if (!$this->has($id)) {
-            throw new NotFoundException('未找到指定id');
+            throw new NotFoundException("Not found the specified id '{$id}' in the container");
         }
 
         $obj = null;

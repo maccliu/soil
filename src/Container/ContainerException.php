@@ -6,15 +6,13 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil\Service;
-
-use Interop\Container\Exception\ContainerException;
+namespace Soil\Container;
 
 /**
  * ContainerException
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class ContainerException extends \Exception implements ContainerException
+class ContainerException extends \Exception implements \Interop\Container\Exception\ContainerException
 {
 }

@@ -6,15 +6,13 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil\Service;
-
-use Interop\Container\Exception\NotFoundException;
+namespace Soil;
 
 /**
- * NotFoundException
+ * Application
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class NotFoundException extends \Exception implements NotFoundException
+class Application extends Container
 {
 }
