@@ -1,6 +1,9 @@
-# `Soil\Loader\AliasLoader`
+# Soil\Loader\AliasLoader
 
-AliasLoader的目的是对`类的别名`进行统一管理。尤其在使用静态化（Statica）的时候，特别有用。
+AliasLoader的目的是对`类的别名`进行统一管理。尤其在使用静态化（类似Laravel的Facade）的时候，特别有用。
+
+> 2016.12.22
+> 更新一下，类似Laravel的Facade的功能，已经用 [Soil\Staticall](../Staticall/Staticall.md) 来实现了，不再需要用到`Soil\Loader\AliasLoader`。`AliasLoader`现在只专门进行简单的类别名的管理。
 
 ## 用法
 
