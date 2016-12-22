@@ -6,23 +6,23 @@
  * WITHOUT WARRANTY OF ANY KIND
  */
 
-namespace Soil\Service;
+namespace Soil;
 
 /**
  * Singleton
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class Singleton
+abstract class Singleton
 {
     /**
-     * 该static成员变量用来保存实例
+     * Saves the unique instance
      */
     private static $_instance = null;
 
 
     /**
-     * 把__construct()私有化，防止创建对象
+     * new is not permitted.
      */
     private function __construct()
     {
@@ -30,7 +30,7 @@ class Singleton
 
 
     /**
-     * 把__clone()私有化，防止创建对象
+     * clone() is not permitted.
      */
     private function __clone()
     {
@@ -38,7 +38,7 @@ class Singleton
 
 
     /**
-     * 获取实例化对象
+     * Gets the instance. If not exists, creates one.
      */
     public static function getInstance()
     {
