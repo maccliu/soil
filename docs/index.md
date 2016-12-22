@@ -10,21 +10,21 @@ Soil是一套PHP底层框架，基于MIT协议。
 
 ##### Container
 
-* [Soil\Container](Container.md)
+* [Soil\Container](Container/Container.md)
 * [Soil\Container\ContainerException](Container/ContainerException.md)
 * [Soil\Container\NotFoundException](Container/NotFoundException.md)
 
 ##### Staticall
 
-* [Soil\Staticall](Staticall.md)
+* [Soil\Staticall](Staticall/Staticall.md)
 
 ##### Application
 
-* [Soil\Application](Application.md)
+* [Soil\Application](Application/Application.md)
 
 ##### Singleton
 
-* [Soil\Singleton](Singleton.md)
+* [Soil\Singleton](Singleton/Singleton.md)
 
 ##### Provider
 
@@ -32,7 +32,7 @@ Soil是一套PHP底层框架，基于MIT协议。
 
 ##### Settings
 
-* [Soil\Settings](Settings.md)
+* [Soil\Settings](Settings/Settings.md)
 
 ##### AliasLoader
 
