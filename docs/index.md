@@ -8,42 +8,36 @@ Soil是一套PHP底层框架，基于MIT协议。
 作者：Macc Liu <mail@maccliu.com>
 
 
-## 1. Service
-
 ##### Container
 
-* [Soil\Service\Container](Service/Container.md)
-* [Soil\Service\ContainerException](Service/ContainerException.md)
-* [Soil\Service\NotFoundException](Service/NotFoundException.md)
+* [Soil\Container](Container.md)
+* [Soil\Container\ContainerException](Container/ContainerException.md)
+* [Soil\Container\NotFoundException](Container/NotFoundException.md)
+
+##### Staticall
+
+* [Soil\Staticall](Staticall.md)
 
 ##### Application
 
-* [Soil\Service\Application](Service/Application.md)
-
-##### Statica
-
-* [Soil\Service\Statica](Service/Statica.md)
+* [Soil\Application](Application.md)
 
 ##### Singleton
 
-* [Soil\Service\Singleton](Service/Singleton.md)
+* [Soil\Singleton](Singleton.md)
 
 ##### Provider
 
 * [Soil\Service\Provider](Service/Provider.md)
 
+##### Settings
 
-## 2. Loader
+* [Soil\Settings](Settings.md)
 
 ##### AliasLoader
 
 * [Soil\Loader\AliasLoader](Loader/AliasLoader.md)
 * [Soil\Loader\AliasLoaderInterface](Loader/AliasLoaderInterface.md)
-
-
-## 3. Common
-
-* [Soil\Common\Settings](Common/Settings.md)
 
 --------
 Copyright (c) 2016-2017 Macc Liu <mail@maccliu.com>.

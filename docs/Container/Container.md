@@ -1,8 +1,8 @@
-# \Soil\Service\Container
+# Soil\Container
 
-Container容器（也被称为服务容器，Service Container），是整个系统最核心的部分。Container本质上可以视为一个大数组，这个数组用key-value的形式存储参数条目和服务条目，供整个系统共享。
+Container容器（也被称为服务容器，Service Container），是整个系统最核心、最常用的部分。Container本质上可以视为一个大数组，这个数组用id-value的形式存储参数条目和服务条目，供整个系统共享。
 
-* Container的key必须是非空字符串，且大小写敏感。
+* Container的id必须是非空字符串，且大小写敏感。
 * Container的value有两种类型：一种是参数型（parameter），一种是服务型（service）。参数型的条目一般储存配置信息，服务型的条目储存的是服务对象。
 * 而服务型的条目，在设置时又可以分为三种：类名字符串、闭包函数、服务实例。
 
@@ -23,7 +23,7 @@ get(参数的id)                  // 取回此参数值
 #### 代码：
 
 ```php
-$container = new \Soil\Service\Container;
+$container = new Soil\Container;
 
 // 用数组形式设置 $container['foo']=bar
 $container['db.host']   = 'localhost';
@@ -77,7 +77,7 @@ get(服务的id)`                    // 获取服务的实例
 注册时：
 
 ```php
-$container = new \Soil\Service\Container;
+$container = new Soil\Container;
 
 // 以类名绑定
 $container->bind('foo', '\\Your\\Class\\Name');  // 用类名字符串的形式bind一个服务到容器
@@ -114,7 +114,7 @@ class Foo {
 
 require(__DIR__ . '/../soil/src/Container.php');
 
-$container = new Soil\Service\Container;
+$container = new Soil\Container;
 
 // 绑定为类名
 $container->bind('aaa', 'Foo');
@@ -139,7 +139,7 @@ class Foo {
 
 require(__DIR__ . '/../soil/src/Container.php');
 
-$container = new Soil\Service\Container;
+$container = new Soil\Container;
 
 // 绑定为闭包函数
 $container->bind('aaa', function() {
@@ -166,7 +166,7 @@ class Foo {
 
 require(__DIR__ . '/../soil/src/Container.php');
 
-$container = new Soil\Service\Container;
+$container = new Soil\Container;
 
 $foo = new Foo();  // 生成服务实例
 echo PHP_EOL . $foo->num;   // 74
