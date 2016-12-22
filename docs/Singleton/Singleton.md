@@ -1,4 +1,4 @@
-# \Soil\Singleton
+# Soil\Singleton
 
 Singleton类实现了单例模式。一个Singleton类只能返回类的唯一实例（`$_instance`）和一个获得该实例的静态方法（`getInstance()`）。
 
