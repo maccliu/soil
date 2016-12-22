@@ -8,8 +8,8 @@
 
 namespace Soil;
 
-use ArrayAccess;
-use Interop\Container\ContainerInterface;
+use \ArrayAccess;
+use \Interop\Container\ContainerInterface;
 
 use Soil\Container\ContainerException;
 use Soil\Container\NotFoundException;
