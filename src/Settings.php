@@ -15,7 +15,7 @@ namespace Soil;
  */
 class Settings implements \ArrayAccess
 {
-    protected $items = [];
+    public $items = [];
 
 
     /**
@@ -64,7 +64,7 @@ class Settings implements \ArrayAccess
      * @param string $key The setting key
      * @param mixed $value
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function set($key, $value)
     {
@@ -106,6 +106,8 @@ class Settings implements \ArrayAccess
      * @param string $group Group name
      *
      * @return array Settings array found, order by their keys. Return [] if not found.
+     *
+     * @throws \InvalidArgumentException
      */
     public function getItemsByGroup($group)
     {
@@ -141,11 +143,11 @@ class Settings implements \ArrayAccess
      * @param string $group The group name.
      * @param array $items
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function setGroup($group, array $items)
     {
-        $this->checkgroup($group);
+        $this->checkGroup($group);
 
         foreach ($items as $key => $value) {
             $this->items[$group . '.' . $key] = $value;
@@ -162,8 +164,6 @@ class Settings implements \ArrayAccess
      */
     public function getGroup($group)
     {
-        $this->checkGroup($group);
-
         $return = [];
         $items = $this->getItemsByGroup($group);
 
@@ -179,7 +179,7 @@ class Settings implements \ArrayAccess
 
 
     /**
-     * Removes all items in the group
+     * Removes all items in a group
      *
      * @param string $group The group name.
      */
@@ -194,28 +194,30 @@ class Settings implements \ArrayAccess
 
 
     /**
-     * Batch set.
+     * Batch set settings.
      *
-     * @param array $userSettings 用户设置
-     * @param array $defaultSettings 默认设置
+     * @param array $user_settings 用户设置
+     * @param array $default_settings 默认设置
      */
-    public function batchSet(array $userSettings, array $defaultSettings = [])
+    public function batchSet(array $user_settings, array $default_settings = [])
     {
-        // process $defaultSettings
-        foreach ($defaultSettings as $key => $value) {
-            if (!$this->has($key)) {
-                $this->checkKey($key);
-                $this->set($key,
-                           $value);
-            }
+        // process $default_settings
+        foreach ($default_settings as $key => $value) {
+            $this->checkKey($key);
         }
 
-        // process $userSettings
-        foreach ($userSettings as $key => $value) {
+        // process $user_settings
+        foreach ($user_settings as $key => $value) {
             $this->checkKey($key);
-            $this->set($key,
-                       $value);
         }
+
+        // merge $default_settings and $user_settings
+        $items = array_merge($default_settings,
+                             $user_settings);
+
+        // merge $items to $this->items
+        $this->items = array_merge($this->items,
+                                   $items);
     }
 
 
@@ -236,9 +238,9 @@ class Settings implements \ArrayAccess
      * @param string $filepath
      * @param string $group
      *
-     * @return array Returns the settings array if OK.
+     * @return array Returns the settings array if everything is OK.
      */
-    public function readSettingFile($filepath, $group = '')
+    public function readSettingFile($filepath, $group = null)
     {
         $require = function () use ($filepath) {
             if (file_exists($filepath)) {
@@ -253,11 +255,10 @@ class Settings implements \ArrayAccess
             return [];
         }
 
-        if (!is_string($group)) {
-            return [];
-        } elseif ($group === '') {
+        if ($group === null) {
             $groupname = '';
         } else {
+            $this->checkGroup($group);
             $groupname = $group . '.';
         }
 
