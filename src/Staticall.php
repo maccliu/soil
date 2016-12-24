@@ -24,11 +24,11 @@ abstract class Staticall
 
 
     /**
-     * Boots the Staticall mechanisms
+     * Starts the Staticall mechanisms
      *
      * @param Soil\Container $container
      */
-    final public static function boot($container)
+    final public static function start($container)
     {
         self::$container = $container;
         self::$staticalls = [];
@@ -72,12 +72,12 @@ abstract class Staticall
 
 
     /**
-     * Bindings the specified staticall to a container service
+     * Links the specified staticall to a container service
      *
      * @param string $staticall_name The staticall name
      * @param string $service_id The service id in the Container
      */
-    public static function set($staticall_name, $service_id)
+    public static function link($staticall_name, $service_id)
     {
         static::$staticalls[$staticall_name] = $service_id;
     }
