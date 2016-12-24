@@ -124,9 +124,9 @@ class Settings implements \ArrayAccess
         // checks one by one, finds starts with 'group.'
         $return = [];
         foreach ($keys as $key) {
-            if (strncasecmp($find,
-                            $key,
-                            $len) === 0) {
+            if (strncmp($find,
+                        $key,
+                        $len) === 0) {
                 $return[$key] = $this->items[$key];
             }
         }
