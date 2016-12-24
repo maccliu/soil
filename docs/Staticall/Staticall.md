@@ -19,18 +19,18 @@ class Demo
     }
 }
 
-$app = new Soil\Container;           // 新容器
-$app->bind('demo','Demo');           // $app['demo'] = 'Demo';
+$app = new Soil\Container;            // 新容器
+$app->bind('demo','Demo');            // $app['demo'] = 'Demo';
 
-Staticall::boot($app);               // 启动Staticall机制
-Staticall::set('Foo', 'demo');       // 告诉PHP，Foo类关联的是$app['demo']
-Staticall::set('Bar', 'demo');       // 告诉PHP，Bar类也关联的是$app['demo']
+Staticall::start($app);               // 启动Staticall机制
+Staticall::link('Foo', 'demo');       // 告诉PHP，Foo类关联的是$app['demo']
+Staticall::link('Bar', 'demo');       // 告诉PHP，Bar类也关联的是$app['demo']
 
-echo Foo::say('hi');                 // 显示 hi and default。
-echo Bar::say('foo', '222');         // 显示 foo and 222
+echo Foo::say('hi');                  // 显示 hi and default
+echo Bar::say('foo', '222');          // 显示 foo and 222
 ```
 
-酷吧，其实根本没有Foo或者Bar这两个被调用的类！实际调用的Demo也没有静态方法say！而且，连Laravel中要定义的DemoFacade类都可以省去！:)
+酷吧，其实系统里面根本没有Foo或者Bar这两个被调用的类！实际调用的Demo类中也不存在静态方法say()！而且，连Laravel中要定义的DemoFacade类文件都可以省去！:)
 
 ## 什么是Staticall
 
