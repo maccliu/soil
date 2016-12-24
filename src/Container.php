@@ -10,7 +10,6 @@ namespace Soil;
 
 use \ArrayAccess;
 use \Interop\Container\ContainerInterface;
-
 use Soil\Container\ContainerException;
 use Soil\Container\NotFoundException;
 
@@ -35,12 +34,17 @@ class Container implements ArrayAccess, ContainerInterface
     private $_keys = [];
 
     /*
-     * 各种类型
+     * 参数型
      */
     private $_parameters = [];  // 参数
+
+    /*
+     * 服务型
+     */
     private $_classnames = [];  // 类名
     private $_closures = [];    // 闭包
     private $_instances = [];   // 已生成的实例
+    private $_singletons = [];  // 单例服务
 
 
     public function __construct()
@@ -204,29 +208,8 @@ class Container implements ArrayAccess, ContainerInterface
               $this->_parameters[$id],
               $this->_classnames[$id],
               $this->_closures,
-              $this->_instances[$id]);
-    }
-
-
-    /**
-     * 删除某个由服务类名（或者闭包函数）生成的服务实例
-     *
-     * 执行本操作后，在下次get时，就会有重新有个新的服务实例生成。
-     *
-     * @param string $id
-     */
-    public function removeServiceInstance($id)
-    {
-        if (!$this->has($id) || !isset($this->_instances[$id])) {
-            return;
-        }
-
-        // 仅针对CLASSNAME_TYPE或者CLOSURE_TYPE生效
-        switch ($this->_keys[$id]) {
-            case self::CLASSNAME_TYPE:
-            case self::CLOSURE_TYPE:
-                unset($this->_instances[$id]);
-        }
+              $this->_instances[$id],
+              $this->_singletons[$id]);
     }
 
 
@@ -240,8 +223,12 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function getNew($id)
     {
-        if (!$this->exists($id)) {
+        if (!$this->has($id)) {
             throw new NotFoundException('未找到指定id');
+        }
+
+        if (isset($this->_singletons[$id])) {
+            throw new \RuntimeException('已被注册为单例服务，不可生成新的服务实例');
         }
 
         $obj = null;
@@ -307,6 +294,19 @@ class Container implements ArrayAccess, ContainerInterface
 
         // 服务注册成功
         return true;
+    }
+
+
+    /**
+     * 注册一个单例服务
+     */
+    public function singleton($id, $service)
+    {
+        $result = $this->bind($id,
+                              $service);
+        if ($result) {
+            $this->_singletons[$id] = true;
+        }
     }
 
 
