@@ -20,16 +20,7 @@ abstract class String
      *
      * @param string $str
      * @param string $subject
-     *
-     */
-
-
-    /**
-     * Checks the $subject is start with $find.
-     *
-     * @param string $str
-     * @param string $subject
-     * @param type $ignore_case
+     * @param bool $ignore_case
      *
      * @return boolean
      */
@@ -56,7 +47,7 @@ abstract class String
      *
      * @param string $str
      * @param string $subject
-     * @param type $ignore_case
+     * @param bool $ignore_case
      *
      * @return boolean
      */
