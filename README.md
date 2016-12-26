@@ -13,7 +13,7 @@ It deals with these complex things, leaving convenience and efficiency to those 
 
 ## Requirements
 
-Soil requires PHP 5.4 or greater.
+Soil requires PHP 5.5 or greater.
 
 
 ## Installation
@@ -35,4 +35,4 @@ Soil is released under the MIT license. [Learn more about the license text](http
 --------
 Copyright (c) 2016-2017 Macc Liu <mail@maccliu.com>.
 
-Soil was written with grit & love. Wish everyone can finish the woh faster and leave more happy time to your sweet family.
+Soil was written with grit & love. Wish everyone can finish the woh quickly and leave more happy time to your sweet home.
