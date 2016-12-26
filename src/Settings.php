@@ -53,8 +53,7 @@ class Settings implements \ArrayAccess
      */
     public function has($key)
     {
-        return array_key_exists($key,
-                                $this->items);
+        return array_key_exists($key, $this->items);
     }
 
 
@@ -98,6 +97,15 @@ class Settings implements \ArrayAccess
 
 
     /**
+     * Clears all settings.
+     */
+    public function clear()
+    {
+        $this->items = [];
+    }
+
+
+    /**
      * Lists all setting items in the same group
      *
      * If we have [foo, foo.aaa, foo.bbb, foo.ccc],
@@ -117,16 +125,12 @@ class Settings implements \ArrayAccess
         $len = mb_strlen($find);
 
         // first, filters all keys include 'group.'
-        $keys = array_keys($this->items,
-                           $find,
-                           true);
+        $keys = array_keys($this->items, $find, true);
 
         // checks one by one, finds starts with 'group.'
         $return = [];
         foreach ($keys as $key) {
-            if (strncmp($find,
-                        $key,
-                        $len) === 0) {
+            if (strncmp($find, $key, $len) === 0) {
                 $return[$key] = $this->items[$key];
             }
         }
@@ -169,8 +173,7 @@ class Settings implements \ArrayAccess
 
         // remove "group." from the key name
         foreach ($items as $key => $value) {
-            $newkey = mb_substr($key,
-                                mb_strlen($group) + 1);
+            $newkey = mb_substr($key, mb_strlen($group) + 1);
             $return[$newkey] = $value;
         }
 
@@ -212,12 +215,10 @@ class Settings implements \ArrayAccess
         }
 
         // merge $default_settings and $user_settings
-        $items = array_merge($default_settings,
-                             $user_settings);
+        $items = array_merge($default_settings, $user_settings);
 
         // merge $items to $this->items
-        $this->items = array_merge($this->items,
-                                   $items);
+        $this->items = array_merge($this->items, $items);
     }
 
 
@@ -315,8 +316,7 @@ class Settings implements \ArrayAccess
      */
     public function offsetSet($key, $value)
     {
-        $this->set($key,
-                   $value);
+        $this->set($key, $value);
     }
 
 
