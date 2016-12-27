@@ -1,6 +1,6 @@
 # Soil
 
-Soil is an underlying PHP framework, under the MIT license.
+Soil is an underlying PHP framework, distributed under MIT license.
 
 Learn more <https://github.com/maccliu/soil>
 
@@ -29,7 +29,7 @@ composer require maccliu/soil
 
 ## License
 
-Soil is released under the MIT license. [Learn more about the license text](https://github.com/maccliu/soil/blob/master/LICENSE).
+Soil is distributed under MIT license. [Learn more about the license text](https://github.com/maccliu/soil/blob/master/LICENSE).
 
 
 --------
