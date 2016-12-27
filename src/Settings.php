@@ -234,14 +234,14 @@ class Settings implements \ArrayAccess
 
 
     /**
-     * Reads a setting file.
+     * Loads a setting file.
      *
      * @param string $filepath
      * @param string $group
      *
      * @return array Returns the settings array if everything is OK.
      */
-    public function readSettingFile($filepath, $group = null)
+    public function load($filepath, $group = null)
     {
         $require = function () use ($filepath) {
             if (file_exists($filepath)) {
