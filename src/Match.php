@@ -66,7 +66,7 @@ abstract class Match
 
 
     /**
-     * Matches $subject with the specified $rule with named vars
+     * Matches $subject with the specified named parameters $rule
      *
      * @param string $subject
      * @param string $rule
@@ -75,7 +75,7 @@ abstract class Match
      *
      * @return int
      */
-    function rule($subject, $rule, &$matches, $rule_vars = null, $ignore_case = false)
+    function namedParameters($subject, $rule, &$matches, $rule_vars = null, $ignore_case = false)
     {
         $preg_delimter = '/';
 

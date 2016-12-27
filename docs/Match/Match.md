@@ -2,20 +2,20 @@
 
 `Match`主要用来匹配一个字符串是否满足特定格式要求。
 
-## isStartWith() 和 isEndWith()
+## isStartWith() 和 isEndWith() 以...开始/结束
 
 ```php
 public static function isStartWith($subject, $find, $ignore_case = false);
 public static function isEndWith($subject, $find, $ignore_case = false);
 ```
 
-## rule()
+## namedParamters() 匹配命名参数
 
 ```php
-function rule($subject, $rule, &$matches, $rule_vars = null, $ignore_case = false);
+function namedParamters($subject, $rule, &$matches, $rule_vars = null, $ignore_case = false);
 ```
 
-### 用法一：基本用法。
+### 用法一：基本模式。
 
 如果不指定$rule中的变量，则默认变量为`{` `变量名` `}`的形式：
 
@@ -39,7 +39,7 @@ $matches = [
 */
 ```
 
-### 用法二：稍微文艺一点的用法。
+### 用法二：文艺模式。
 
 只指定变量名，不指定变量的正则表达式（可用null代替），则将$rule表达式用这些指定的变量名匹配。
 
@@ -109,7 +109,9 @@ $result1 = Match::rule($subject1, $rule, $matches, $rule_vars);    // false
 $result2 = Match::rule($subject2, $rule, $matches, $rule_vars);    // true
 ```
 
-### 用法三：黑客模式。变量的正则模板也自己设置。这样基本能灵活的应付95%以上的网站匹配需求了。
+### 用法三：黑客模式。
+
+变量的正则模板也自己设置。基本能灵活应付95%以上的网站匹配需求了。
 
 ```php
 use \Soil\Match;
