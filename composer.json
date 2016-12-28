@@ -1,6 +1,6 @@
 {
   "name": "maccliu/soil",
-  "description": "Soil: An underlying PHP framework, under the MIT license.",
+  "description": "A tidy PHP framework",
   "type": "library",
   "license": "MIT",
   "homepage": "https://github.com/maccliu/soil",
