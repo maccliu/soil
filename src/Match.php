@@ -15,6 +15,8 @@ namespace Soil;
  */
 abstract class Match
 {
+    const TOKEN_TEXT = 'TEXT';
+    const TOKEN_VAR = 'VAR';
 
 
     /**
@@ -66,26 +68,34 @@ abstract class Match
 
 
     /**
-     * Matches $subject with the specified named parameters $rule
+     * Splits a $rule into tokens array.
      *
-     * @param string $subject
-     * @param string $rule
-     * @param null|array $rule_vars ['str1'=>'pattern1', 'str2'=>'pattern2', ...]
-     * @param array $matches Returns the matches if matched.
+     * @param string    $rule       a rule to split
+     * @param array     $rule_vars  ['var1'=>'pattern1', 'var1'=>'pattern2', ...]
+     * @param null      $rule_vars  Using a default setting like {var}
      *
-     * @return int
+     * @return null     If $rule_vars invalid.
+     * @return array    [
+     *                      [type, text or var],
+     *                      [type, text or var],
+     *                      ...
+     *                   ]
      */
-    function namedParameters($subject, $rule, &$matches, $rule_vars = null, $ignore_case = false)
+    public static function tokenizeRule($rule, $rule_vars = null)
     {
         $preg_delimter = '/';
 
+        $return = [];
+
         // Gets all variable names
         if ($rule_vars === null) {
-            // Default, uses the default declare style, such as {foo},{bar}
+            // Using a default setting like {var}
             $pattern_vars = $preg_delimter . '\{([^\{\}]+?)\}' . $preg_delimter;
         } elseif (is_array($rule_vars)) {
             if (empty($rule_vars)) {
-                $pattern_vars = null;
+                // If not defined any variable.
+                $return[] = [self::TOKEN_TEXT, $rule];
+                return $return;
             } else {
                 // Gets the variable names from $rule_vars.
                 $var_names = [];
@@ -98,106 +108,116 @@ abstract class Match
             }
         } else {
             // Invalid $rule_vars
-            return false;
+            return null;
         }
 
         // Gets all variables in the $rule.
-        if ($pattern_vars === null) {
-            $result = false;
-        } else {
-            $vars = [];
-            $result = preg_match_all($pattern_vars, $rule, $vars, PREG_OFFSET_CAPTURE);
-        }
+        $matches = [];
+        $result = preg_match_all($pattern_vars, $rule, $matches, PREG_OFFSET_CAPTURE);
 
-        // If not found any variables in $rule
+        // Returns if not matched.
         if (!$result) {
-            if ($ignore_case) {
-                return (strncasecmp($subject, $rule, strlen($rule)) === 0);
-            } else {
-                return (strncmp($subject, $rule, strlen($rule)) === 0);
-            }
+            $return[] = [self::TOKEN_TEXT, $rule];
+            return $return;
         }
 
-        // Maps the user variables to the inner Variables
-        // {foo} => var1
-        $var_user_inner = [];
+        $lastpos = 0;
 
-        // Maps the inner variables to the user Variables
-        // var1 => {foo}
-        $var_inner_user = [];
-
-        $pattern = [];      // Splits $rule into many pattern parts
-        $lastpos = 0;       // last pos
-        $var_id = 1;        // inner variable increment id
-        // Processes the begining part.
-        $pattern[] = '^';
-
-        // Loops to process each parts
-        foreach ($vars[0] as $part) {
+        foreach ($matches[0] as $part) {
             list($var, $pos) = $part;
 
-            // The normal text part
+            // Adds the text
             if ($pos > $lastpos) {
                 $s = substr($rule, $lastpos, $pos - $lastpos);
-                $s = preg_quote($s, $preg_delimter);
-                $pattern[] = $s;
+                $return[] = [ self::TOKEN_TEXT, $s];
             }
 
-            // The variable part
-            if (!array_key_exists($var, $var_user_inner)) {
-                // Creates an item in the $var_user_inner and $var_inner_user
-                // if $var not exists in them.
-                $inner_var = 'var' . $var_id;
-                $var_user_inner[$var] = $inner_var;         // $var_user_inner['{foo}'] = 'var1'
-                $var_inner_user[$inner_var] = $var;         // $var_inner_user['var1'] = '{foo}'
-                $var_id++;
+            // Adds this var
+            $return[] = [self::TOKEN_VAR, $var];
 
-                // Buiilds the pattern for this variable
-                if (is_array($rule_vars) && is_string($rule_vars[$var])) {
-                    // If $rules_vars defines a valid pattern, use it directly.
-                    $p = $rule_vars[$var];
-                } else {
-                    // Find the $breakchar
-                    $breakchar = substr($rule, $pos + strlen($var), 1);
-                    if ($breakchar === '') {
-                        $p = '.*';
-                    } else {
-                        $p = '[^' . preg_quote($breakchar, $preg_delimter) . ']+?';
-                    }
-                }
-
-                // Builds a pattern with the sub-group name
-                $pattern[] = '(?<' . $var_user_inner[$var] . '>' . $p . ')';
-            } else {
-                // Puts a backward-reference here, if the variable was defined already.
-                $pattern[] = '(\\k<' . $var_user_inner[$var] . '>)';
-            }
-
-            // forwords the $lastpos to the next char
+            // Moves the $lastpos
             $lastpos = $pos + strlen($var);
         }
 
-        // Processes the tail part.
+        // Adds the tail.
         $s = substr($rule, $lastpos);
-        $s = preg_quote($s, $preg_delimter);
-        $pattern[] = $s;
+        if ($s !== '') {
+            $return[] = [self::TOKEN_TEXT, $s];
+        }
 
-        // Implodes the whole pattern!
-        $pattern = implode('', $pattern);
-        $pattern = $preg_delimter . $pattern . $preg_delimter;
+        return $return;
+    }
+
+
+    /**
+     * Matches $subject with the specified named parameters $rule
+     *
+     * @param string        $subject
+     * @param array         $matches    Returns the matches array if matched.
+     * @param string        $rule
+     * @param null|array    $rule_vars  ['var1'=>'pattern1', 'var1'=>'pattern2', ...]
+     * @param bool          $ignore_case
+     * @param string        $terminate_chars
+     *
+     * @return int
+     */
+    public static function namedParameters($subject, &$matches, $rule, $rule_vars = null, $ignore_case = false,
+                                           $terminate_chars = '/\\?#')
+    {
+        $preg_delimter = '/';
+
+        $rule_parts = self::tokenizeRule($rule, $rule_vars);
+        if ($rule_parts === null) {
+            return null;
+        }
+
+        $vartable = []; // $vartable['{foo}'] => $var1
+
+        $patterns = [];
+        $patterns[] = '^';
+
+        foreach ($rule_parts as $id => $part) {
+            list($type, $token) = $part;
+
+            switch ($type) {
+                case self::TOKEN_TEXT:
+                    $patterns[] = preg_quote($token, $preg_delimter);
+                    break;
+
+                case self::TOKEN_VAR:
+                    /*
+                     * If $vartable[$text] defined, just add a backward-reference,
+                     * Or creates a new var entry.
+                     */
+                    if (array_key_exists($token, $vartable)) {
+                        $pattern[] = '(\\k<' . $vartable[$token] . '>)';
+                    } else {
+                        $vartable[$token] = 'var' . $id;
+                        if ($rule_vars === null || !isset($rule_vars[$token])) {
+                            $p = '[^' . preg_quote($terminate_chars, $preg_delimter) . ']+';
+                        } else {
+                            $p = $rule_vars[$token];
+                        }
+                        $patterns[] = '(?<' . $vartable[$token] . '>' . $p . ')';
+                    }
+                    break;
+            }
+        }
+
+        $patterns = $preg_delimter . implode('', $patterns) . $preg_delimter;
         if ($ignore_case) {
-            $pattern = $pattern . 'i';  // Case-insensitive
+            $patterns = $patterns . 'i';  // Case-insensitive
         }
 
         // Executes the preg_match_all, returns the result.
         $submatches = [];
-        $result = preg_match_all($pattern, $subject, $submatches);
+        $result = preg_match($patterns, $subject, $submatches);
 
         // If matched, puts the variables value into $matches
         if ($result) {
-            $matches = [];
-            foreach ($var_user_inner as $user => $inner) {
-                $matches[$user] = $submatches[$inner][0];
+            $matches[0] = $submatches[0];
+            foreach ($vartable as $token => $var) {
+                $matches[$token] = $submatches[$var];
             }
         }
 

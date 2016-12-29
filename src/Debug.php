@@ -15,8 +15,6 @@ namespace Soil;
  */
 class Debug
 {
-
-
     public static function halt($var)
     {
         var_dump($var);
