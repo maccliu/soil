@@ -239,7 +239,7 @@ class Settings implements \ArrayAccess
      * @param string $filepath
      * @param string $group
      *
-     * @return array Returns the settings array if everything is OK.
+     * @return bool success/fail
      */
     public function load($filepath, $group = null)
     {
@@ -247,13 +247,13 @@ class Settings implements \ArrayAccess
             if (file_exists($filepath)) {
                 return require($filepath);
             } else {
-                return [];
+                return false;
             }
         };
         $items = $require();
 
         if (empty($items)) {
-            return [];
+            return false;
         }
 
         if ($group === null) {
@@ -263,11 +263,10 @@ class Settings implements \ArrayAccess
             $groupname = $group . '.';
         }
 
-        $return = [];
         foreach ($items as $key => $value) {
-            $return[$groupname . $key] = $value;
+            $this->items[$groupname . $key] = $value;
         }
-        return $return;
+        return true;
     }
 
 
