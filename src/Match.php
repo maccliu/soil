@@ -9,7 +9,7 @@
 namespace Soil;
 
 /**
- * Description of String
+ * Tests a subject whether it matches a specified rule.
  *
  * @author Macc Liu <mail@maccliu.com>
  */
@@ -153,9 +153,10 @@ abstract class Match
      * Matches $subject with the specified named parameters $rule
      *
      * @param string        $subject
-     * @param array         $matches    Returns the matches array if matched.
+     * @param array         $matches        Returns the matches array if matched.
      * @param string        $rule
-     * @param null|array    $rule_vars  ['var1'=>'pattern1', 'var1'=>'pattern2', ...]
+     * @param null          $rule           Uses the default style {foo}.
+     * @param array         $rule_vars      ['var1'=>'pattern1', 'var1'=>'pattern2', ...]
      * @param bool          $ignore_case
      * @param string        $terminate_chars
      *
@@ -216,6 +217,7 @@ abstract class Match
         // If matched, puts the variables value into $matches
         if ($result) {
             $matches[0] = $submatches[0];
+            $matches[-1] = substr($subject, strlen($matches[0]));
             foreach ($vartable as $token => $var) {
                 $matches[$token] = $submatches[$var];
             }
