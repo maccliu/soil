@@ -271,6 +271,20 @@ class Settings implements \ArrayAccess
 
 
     /**
+     * Merges the src setting to the current settings.
+     *
+     * @param \Soil\Settings $src
+     */
+    public function merge(\Soil\Settings $src)
+    {
+        $keys = $src->keys();
+        foreach ($keys as $key) {
+            $this->items[$key] = $src[$key];
+        }
+    }
+
+
+    /**
      * Checks the $key type is string and not a null string.
      *
      * @param string $key
