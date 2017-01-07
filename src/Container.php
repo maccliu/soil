@@ -82,8 +82,7 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function offsetSet($id, $value)
     {
-        return $this->set($id,
-                          $value);
+        return $this->set($id, $value);
     }
 
 
@@ -117,8 +116,7 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function has($id)
     {
-        return array_key_exists($id,
-                                $this->_keys);
+        return array_key_exists($id, $this->_keys);
     }
 
 
@@ -131,7 +129,7 @@ class Container implements ArrayAccess, ContainerInterface
      *
      * @return mixed
      */
-    public function get($id)
+    public function get($id, $params = [])
     {
         if (!$this->has($id)) {
             throw new NotFoundException("Not found the specified id '{$id}' in the container");
@@ -152,8 +150,7 @@ class Container implements ArrayAccess, ContainerInterface
                     return $this->_instances[$id];
                 }
                 // 如果是第一次运行，则创建新服务实例，并保存备用
-                $serviceInstance = call_user_func_array($this->_closures[$id],
-                                                        $params);
+                $serviceInstance = call_user_func_array($this->_closures[$id], $params);
                 $this->_instances[$id] = $serviceInstance;
                 return $serviceInstance;
 
@@ -204,12 +201,8 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function remove($id)
     {
-        unset($this->_keys[$id],
-              $this->_parameters[$id],
-              $this->_classnames[$id],
-              $this->_closures,
-              $this->_instances[$id],
-              $this->_singletons[$id]);
+        unset($this->_keys[$id], $this->_parameters[$id], $this->_classnames[$id], $this->_closures,
+              $this->_instances[$id], $this->_singletons[$id]);
     }
 
 
@@ -221,7 +214,7 @@ class Container implements ArrayAccess, ContainerInterface
      * @return mixed
      * @throws NotFoundException
      */
-    public function getNew($id)
+    public function getNew($id, $param = [])
     {
         if (!$this->has($id)) {
             throw new NotFoundException('未找到指定id');
@@ -241,8 +234,7 @@ class Container implements ArrayAccess, ContainerInterface
                 return $this->_instances[$id];
 
             case self::CLOSURE_TYPE:
-                $serviceInstance = call_user_func_array($this->_closures[$id],
-                                                        $params);
+                $serviceInstance = call_user_func_array($this->_closures[$id], $params);
                 return $serviceInstance;
 
             case self::CLASSNAME_TYPE:
@@ -302,8 +294,7 @@ class Container implements ArrayAccess, ContainerInterface
      */
     public function singleton($id, $service)
     {
-        $result = $this->bind($id,
-                              $service);
+        $result = $this->bind($id, $service);
         if ($result) {
             $this->_singletons[$id] = true;
         }
@@ -341,25 +332,19 @@ class Container implements ArrayAccess, ContainerInterface
         $matches = '';
 
         // 检查开始字符是数字或者结尾字符是\
-        $result = preg_match('/^\\d/',
-                             $classname,
-                             $matches);
+        $result = preg_match('/^\\d/', $classname, $matches);
         if ($result > 0) {
             return false;
         }
 
         // 检查存在非单词字符
-        $result = preg_match('/[^\w\\\]/',
-                             $classname,
-                             $matches);
+        $result = preg_match('/[^\w\\\]/', $classname, $matches);
         if ($result > 0) {
             return false;
         }
 
         // 检查 \数字 这种形式的错误
-        $result = preg_match('/(\\\\\d)/',
-                             $classname,
-                             $matches);
+        $result = preg_match('/(\\\\\d)/', $classname, $matches);
         if ($result > 0) {
             return false;
         }
