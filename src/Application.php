@@ -8,12 +8,15 @@
 
 namespace Soil;
 
+use \Soil\Container;
+use \Soil\Settings;
+
 /**
  * Application
  *
  * @author Macc Liu <mail@maccliu.com>
  */
-class Application extends \Soil\Container
+class Application extends Container
 {
     public $default_module = 'Index';
     public $default_controller = 'Index';
@@ -26,7 +29,7 @@ class Application extends \Soil\Container
      *
      * @param \Soil\Settings $conf
      */
-    public function config(\Soil\Settings $conf)
+    public function config(Settings $conf)
     {
         $keys = $conf->keys();
         foreach ($keys as $key) {
