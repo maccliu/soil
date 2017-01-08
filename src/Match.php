@@ -28,7 +28,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function testStartWith($subject, $find, $ignore_case = false)
+    public static function startWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;
@@ -51,7 +51,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function testEndWith($subject, $find, $ignore_case = false)
+    public static function endWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;
@@ -63,6 +63,24 @@ abstract class Match
             return (strncasecmp($_find, $_subject, $len) === 0);
         } else {
             return (strncmp($_find, $_subject, $len) === 0);
+        }
+    }
+
+
+    /**
+     *
+     * @param string $subject
+     * @param string $find
+     * @param bool $ignore_case
+     *
+     * @return bool
+     */
+    public static function equal($subject, $find, $ignore_case = false)
+    {
+        if ($ignore_case) {
+            return strcasecmp($find, $subject) === 0;
+        } else {
+            return strcmp($find, $subject) === 0;
         }
     }
 

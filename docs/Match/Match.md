@@ -2,11 +2,15 @@
 
 `Match`主要用来匹配一个字符串是否满足特定格式要求。
 
-## testStartWith() 和 testEndWith() 以...开始/结束
+## 简单字符串比较
+
+* stratWith() 以...开始
+* endWith() 以...结束
+* equal() 相等
 
 ```php
-public static function testStartWith($subject, $find, $ignore_case = false);
-public static function testEndWith($subject, $find, $ignore_case = false);
+public static function stratWith($subject, $find, $ignore_case = false);
+public static function endWith($subject, $find, $ignore_case = false);
 ```
 
 ## tokenizeRule() 分解一个rule为tokens
@@ -126,7 +130,7 @@ $result2 = Match::namedParameters($subject2, $matches2, $rule, $rule_vars);    /
 
 ### 用法三：黑客模式。
 
-变量的正则模板也自己设置。基本能灵活应付95%以上的网站匹配需求了。
+变量的正则模板也自己设置的话，基本能满足95%以上的常规网站匹配需求了。
 
 ```php
 use \Soil\Match;
