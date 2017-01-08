@@ -20,7 +20,7 @@ abstract class Match
 
 
     /**
-     * Checks if the $subject is start with $find.
+     * Checks if the $subject starts with $find.
      *
      * @param string $subject
      * @param string $find
@@ -28,7 +28,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function isStartWith($subject, $find, $ignore_case = false)
+    public static function testStartWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;
@@ -43,7 +43,7 @@ abstract class Match
 
 
     /**
-     * Checks if the $subject is end with $find.
+     * Checks if the $subject ends with $find.
      *
      * @param string $subject
      * @param string $find
@@ -51,7 +51,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function isEndWith($subject, $find, $ignore_case = false)
+    public static function testEndWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;

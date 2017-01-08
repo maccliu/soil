@@ -38,10 +38,9 @@ Soil是一套PHP底层框架，基于MIT协议。
 
 * [Soil\Service\Provider](Service/Provider.md)
 
-##### AliasLoader
+##### Loader
 
-* [Soil\Loader\AliasLoader](Loader/AliasLoader.md)
-* [Soil\Loader\AliasLoaderInterface](Loader/AliasLoaderInterface.md)
+* [Soil\Loader\Loader](Loader/Loader.md)
 
 --------
 Copyright (c) 2016-2017 Macc Liu <mail@maccliu.com>.

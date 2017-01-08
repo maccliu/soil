@@ -2,11 +2,11 @@
 
 `Match`主要用来匹配一个字符串是否满足特定格式要求。
 
-## isStartWith() 和 isEndWith() 以...开始/结束
+## testStartWith() 和 testEndWith() 以...开始/结束
 
 ```php
-public static function isStartWith($subject, $find, $ignore_case = false);
-public static function isEndWith($subject, $find, $ignore_case = false);
+public static function testStartWith($subject, $find, $ignore_case = false);
+public static function testEndWith($subject, $find, $ignore_case = false);
 ```
 
 ## tokenizeRule() 分解一个rule为tokens
@@ -25,7 +25,7 @@ public static function namedParameters($subject,
 									   $rule,
 									   $rule_vars = null,
 									   $ignore_case = false,
-                                       $terminate_chars = '/\\?#')
+                     $terminate_chars = '/\\?#')
 ```
 
 ### 用法一：基本模式。
