@@ -19,7 +19,7 @@ abstract class Staticall
 {
     protected static $container = null;
     protected static $staticalls = [];      // maps Foo to service_id
-    protected static $fqcns = [];            // maps Namespace\FooStaticall to Foo
+    protected static $fqcns = [];           // maps Namespace\FooStaticall to Foo
     protected static $registerd = false;
 
 
