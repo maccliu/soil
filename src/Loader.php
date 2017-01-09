@@ -35,7 +35,7 @@ class Loader
             return true;
         }
 
-        $this->_registered = spl_autoload_register([$this, 'load']);
+        $this->_registered = spl_autoload_register([$this, 'autoload']);
         return $this->_registered;
     }
 
@@ -47,7 +47,7 @@ class Loader
      *
      * @return bool
      */
-    public function load($class)
+    protected function autoload($class)
     {
         foreach ($this->_queue as $record) {
             switch ($record['type']) {
