@@ -27,7 +27,7 @@ class Application extends Container
     /**
      * Import settings
      *
-     * @param \Soil\Settings $conf
+     * @param Settings $conf
      */
     public function config(Settings $conf)
     {
