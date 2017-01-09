@@ -8,6 +8,8 @@
 
 namespace Soil;
 
+use Soil\Settings;
+
 /**
  * Settings
  *
@@ -117,7 +119,7 @@ class Settings implements \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    public function getItemsByGroup($group)
+    public function getGroupItems($group)
     {
         $this->checkGroup($group);
 
@@ -169,7 +171,7 @@ class Settings implements \ArrayAccess
     public function getGroup($group)
     {
         $return = [];
-        $items = $this->getItemsByGroup($group);
+        $items = $this->getGroupItems($group);
 
         // remove "group." from the key name
         foreach ($items as $key => $value) {
@@ -188,7 +190,7 @@ class Settings implements \ArrayAccess
      */
     public function removeGroup($group)
     {
-        $items = $this->getItemsByGroup($group);
+        $items = $this->getGroupItems($group);
 
         foreach ($items as $key => $value) {
             unset($this->items[$key]);

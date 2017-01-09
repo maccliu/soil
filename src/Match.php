@@ -28,7 +28,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function startWith($subject, $find, $ignore_case = false)
+    public static function startsWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;
@@ -51,7 +51,7 @@ abstract class Match
      *
      * @return bool
      */
-    public static function endWith($subject, $find, $ignore_case = false)
+    public static function endsWith($subject, $find, $ignore_case = false)
     {
         if (!is_string($find) || !is_string($subject)) {
             return false;

@@ -24,11 +24,11 @@ abstract class Staticall
 
 
     /**
-     * Starts the Staticall mechanisms
+     * Registers the Staticall mechanisms to spl_autoload
      *
      * @param Soil\Container $container
      */
-    final public static function start($container)
+    final public static function register($container)
     {
         self::$container = $container;
         self::$staticalls = [];
