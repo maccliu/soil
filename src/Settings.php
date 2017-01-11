@@ -17,6 +17,7 @@ use Soil\Settings;
  */
 class Settings implements \ArrayAccess
 {
+    private $locked = false;
     public $items = [];
 
 
@@ -69,6 +70,8 @@ class Settings implements \ArrayAccess
      */
     public function set($key, $value)
     {
+        $this->checkLocked();
+
         $this->checkKey($key);
         $this->items[$key] = $value;
     }
@@ -94,6 +97,8 @@ class Settings implements \ArrayAccess
      */
     public function remove($key)
     {
+        $this->checkLocked();
+
         unset($this->items[$key]);
     }
 
@@ -103,6 +108,8 @@ class Settings implements \ArrayAccess
      */
     public function clear()
     {
+        $this->checkLocked();
+
         $this->items = [];
     }
 
@@ -153,6 +160,8 @@ class Settings implements \ArrayAccess
      */
     public function setGroup($group, array $items)
     {
+        $this->checkLocked();
+
         $this->checkGroup($group);
 
         foreach ($items as $key => $value) {
@@ -190,6 +199,8 @@ class Settings implements \ArrayAccess
      */
     public function removeGroup($group)
     {
+        $this->checkLocked();
+
         $items = $this->getGroupItems($group);
 
         foreach ($items as $key => $value) {
@@ -206,6 +217,8 @@ class Settings implements \ArrayAccess
      */
     public function batchSet(array $user_settings, array $default_settings = [])
     {
+        $this->checkLocked();
+
         // process $default_settings
         foreach ($default_settings as $key => $value) {
             $this->checkKey($key);
@@ -245,6 +258,8 @@ class Settings implements \ArrayAccess
      */
     public function load($filepath, $group = null)
     {
+        $this->checkLocked();
+
         $require = function () use ($filepath) {
             if (file_exists($filepath)) {
                 return require($filepath);
@@ -279,9 +294,37 @@ class Settings implements \ArrayAccess
      */
     public function merge(\Soil\Settings $src)
     {
+        $this->checkLocked();
+
         $keys = $src->keys();
         foreach ($keys as $key) {
             $this->items[$key] = $src[$key];
+        }
+    }
+
+
+    /**
+     * Locks the setting values, makes all values readonly
+     */
+    public function lock()
+    {
+        $this->locked = true;
+    }
+
+
+    /**
+     * Unlocks the setting values
+     */
+    public function unlock()
+    {
+        $this->locked = false;
+    }
+
+
+    private function checkLocked()
+    {
+        if ($this->locked) {
+            throw new \Exception('This settings had been locked.');
         }
     }
 
