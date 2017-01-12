@@ -17,45 +17,47 @@ use Soil\Lang;
  */
 class Lang implements \ArrayAccess
 {
-    public $lang_root = null;
-    public $lang_file = null;
-    public $source_lang = null;
-    public $target_lang = null;
-    public $source = [];
-    public $target = [];
+    /* for read */
+    private $root = null;
+    private $rel = null;
+    private $source_lang = null;
+    private $target_lang = null;
+    private $source = [];
+    private $target = [];
+    private $loaded = false;
+
+    /* for save */
     private $autosave = false;
     private $source_changed = false;
     private $target_changed = false;
-    private $loaded  =false;
-
-    const DEFAULT_LANG = 'en_US';
 
 
-    public function __construct($lang_root = null, $source_lang = null, $lang_file = null)
+    public function __construct($root = null, $rel = null, $source_lang = null, $target_lang = null)
     {
-        $this->setLangRoot($lang_root);
-        $this->setLangFile($lang_file);
+        $this->setRoot($root);
+        $this->setRel($rel);
         $this->setSourceLang($source_lang);
+        $this->setTargetLang($target_lang);
     }
 
 
-    public function setLangRoot($lang_root)
+    public function setRoot($root)
     {
-        if (is_string($lang_root) && file_exists($lang_root) && is_dir($lang_root)) {
-            $this->lang_root = realpath($lang_root);
+        if (is_string($root) && file_exists($root) && is_dir($root)) {
+            $this->root = realpath($root);
         } else {
-            $this->lang_root = null;
+            $this->root = null;
         }
         return $this;
     }
 
 
-    public function setLangFile($lang_file)
+    public function setRel($rel)
     {
-        if (is_string($lang_file) && $lang_file !== '') {
-            $this->lang_file = $lang_file;
+        if (is_string($rel)) {
+            $this->rel = $rel;
         } else {
-            $this->lang_file = null;
+            $this->rel = null;
         }
         return $this;
     }
@@ -68,6 +70,7 @@ class Lang implements \ArrayAccess
         } else {
             $this->source_lang = null;
         }
+        $this->loaded = false;
         return $this;
     }
 
@@ -79,6 +82,14 @@ class Lang implements \ArrayAccess
         } else {
             $this->target_lang = null;
         }
+        $this->loaded = false;
+        return $this;
+    }
+
+
+    public function setAutosave($bool)
+    {
+        $this->autosave = $bool;
         return $this;
     }
 
@@ -89,9 +100,11 @@ class Lang implements \ArrayAccess
             $this->load();
         }
 
-        if (!array_key_exists($text, $this->source)) {
-            $this->source[$text] = true;
-            $this->source_changed = true;
+        if ($this->autosave) {
+            if (!array_key_exists($text, $this->source)) {
+                $this->source[$text] = true;
+                $this->source_changed = true;
+            }
         }
 
         if (array_key_exists($text, $this->target)) {
@@ -110,20 +123,18 @@ class Lang implements \ArrayAccess
     }
 
 
-    public function autosave($bool)
+    public function __destruct()
     {
-        $this->autosave = $bool;
-        return $this;
+        if ($this->autosave) {
+            $this->save();
+            return;
+        }
     }
 
 
-    public function __destruct()
+    public function save()
     {
-        if (!$this->autosave) {
-            return;
-        }
-
-        if (is_null($this->lang_root) || is_null($this->lang_file)) {
+        if (is_null($this->root) || is_null($this->rel)) {
             return;
         }
 
@@ -139,30 +150,37 @@ class Lang implements \ArrayAccess
     }
 
 
+    /**
+     * Loads a lang file to the specified array.
+     *
+     * @param string $lang
+     * @param array  $array
+     *
+     * @return bool
+     */
     private function loadLang($lang, &$array)
     {
         $array = [];
 
-        $root = $this->lang_root;
-        if (is_null($root) || !file_exists($root) || !is_dir($root)) {
-            return;
+        $root = $this->root;
+        $rel = $this->rel;
+
+        if (!is_string($root) || !is_string($rel) || !is_string($lang)) {
+            return false;
         }
 
-        if (!is_string($lang) || ($lang === '') || !file_exists("$root/$lang") || !is_dir("$root/$lang")) {
-            return;
-        }
-
-        $file = $this->lang_file;
-        if (!is_string($file) || $file === '') {
-            return;
-        }
-
-        $path = "$root/$lang/$file";
+        $path = "{$root}/{$rel}/{$lang}.php";
         if (!file_exists($path) || !is_file($path)) {
-            return;
+            return false;
         }
 
-        $array = require($path);
+        $result = require($path);
+        if (is_array($result)) {
+            $array = $result;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -170,28 +188,27 @@ class Lang implements \ArrayAccess
      * @param string  $lang
      * @param array   $array
      *
-     * @return boolean
+     * @return bool
      */
     private function saveLang($lang, &$array)
     {
-        $lang_root = $this->lang_root;
-        if ($lang_root === null) {
+        $root = $this->root;
+        $rel = $this->rel;
+
+        if (!is_string($root) || !is_string($rel) || !is_string($lang)) {
             return false;
         }
 
-        $lang_file = $this->lang_file;
-        if ($lang_file === null) {
-            return false;
-        }
-
-        $path = "{$lang_root}/{$lang}/{$lang_file}";
-        $dir = dirname($path);
+        $dir = "{$root}/{$rel}";
         if (!file_exists($dir)) {
-            @mkdir($dir, 0777);
-        }
-        if (!file_exists($dir) || !is_dir($dir)) {
+            if (!@mkdir($dir, 0777)) {
+                return false;
+            }
+        } elseif (!is_dir($dir)) {
             return false;
         }
+
+        $path = "$dir/{$lang}.php";
 
         $var = var_export($array, true);
         $content = <<<EOF
