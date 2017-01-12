@@ -102,7 +102,7 @@ class Lang implements \ArrayAccess
 
         if ($this->autosave) {
             if (!array_key_exists($text, $this->source)) {
-                $this->source[$text] = true;
+                $this->source[$text] = '';
                 $this->source_changed = true;
             }
         }
