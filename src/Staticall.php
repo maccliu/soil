@@ -17,23 +17,40 @@ use Soil\Container;
  */
 abstract class Staticall
 {
-    protected static $container = null;
+    public static $container = null;
+    public static $cachepath = null;
+
     protected static $staticalls = [];      // maps Foo to service_id
     protected static $fqcns = [];           // maps Namespace\FooStaticall to Foo
-    protected static $registerd = false;
+
+    private static $registerd = false;
+    private static $eval_enabled = false;
 
 
     /**
-     * Registers this Staticall to spl_autoload
+     * Initializes this Staticall
      *
      * @param Container $container
      */
-    final public static function register(Container $container)
+    final public static function __construct(Container $container, $cachepath = null)
     {
-        self::$container = $container;
-        self::$staticalls = [];
-        self::$fqcns = [];
+        static::$staticalls = [];
+        static::$fqcns = [];
 
+        // sets the container
+        static::$container = $container;
+
+        // sets the cache root directory
+        if (is_string($cachepath) && file_exists($cachepath) && is_dir($cachepath)) {
+            static::$cachepath = $cachepath;
+        } else {
+            static::$cachepath = null;
+        }
+
+        // checks eval() enabled
+        static::$eval_enabled = function_exists('eval');
+
+        // register
         static::$registerd = spl_autoload_register([get_called_class(), 'autoload']);
     }
 
@@ -43,18 +60,18 @@ abstract class Staticall
      */
     final public static function autoload($class)
     {
-        if (array_key_exists($class,
-                             static::$staticalls)) {
+        if (array_key_exists($class, static::$staticalls)) {
             static::loadStaticallClass($class);
         }
     }
 
 
     /**
-     * Load the specified StaticallClass
+     * Loads the specified Staticall class
      *
-     * If eval() can work, use eval() to fake a FooStaticall Class.
-     * If evel() be disabled, we have to create a Class file using the template.
+     * If PHP evel() function works, we use eval() to generator a FooStaticall class,
+     * If evel() has been disabled, we have to write a FooStaticall class file to a temporary file firstly,
+     * then include it.
      *
      * @param string $class
      */
@@ -62,11 +79,30 @@ abstract class Staticall
     {
         $fqcn = __NAMESPACE__ . "\\{$class}Staticall";
 
-        $def = self::createStaticallClass($class);
-        eval($def); // wish eval() can work.
+        $def = static::createStaticallClass($class);
+        if (function_exists('eval')) {
+            eval($def); // Hope eval() works, its usage is more simple.
+        } else {
+            $cachepath = self::$cachepath;
+            if ($cachepath === null || !file_exists($cachepath) || !is_dir($cachepath)) {
+                throw new \Exception("Fail to create a {$class}Staticall class.");
+                return false;
+            }
 
-        class_alias($fqcn,
-                    $class);
+            $filename = realpath($cachepath) . '/' . $fqcn . '.php';
+
+            if (!file_exists($filename)) {
+                $result = file_put_contents($filename, $def);
+                if ($result === false) {
+                    throw new \Exception("Fail to create a {$class}Staticall file.");
+                    return false;
+                }
+            }
+
+            require $filename;
+        }
+
+        class_alias($fqcn, $class);
         self::$fqcns[$fqcn] = $class;
     }
 
@@ -74,10 +110,10 @@ abstract class Staticall
     /**
      * Links the specified staticall to a container service
      *
-     * @param string $staticall_name The staticall name
-     * @param string $service_id The service id in the Container
+     * @param string $staticall_name  The staticall name, like 'Foo'
+     * @param string $service_id      The service id in the Container
      */
-    public static function link($staticall_name, $service_id)
+    final public static function link($staticall_name, $service_id)
     {
         static::$staticalls[$staticall_name] = $service_id;
     }
@@ -89,13 +125,12 @@ abstract class Staticall
     public static function __callStatic($method, $arguments)
     {
         $fqcn = get_called_class();
-        $class = self::$fqcns[$fqcn];
+        $class = static::$fqcns[$fqcn];
         $id = static::$staticalls[$class];
 
         if (static::$container->has($id)) {
             $instance = static::$container[$id];
-            return call_user_func_array([$instance, $method],
-                                        $arguments);
+            return call_user_func_array([$instance, $method], $arguments);
         } else {
             throw new \RuntimeException("Staticall {$class}::{$method} fail. Not found the corresponded service.");
         }
@@ -104,8 +139,6 @@ abstract class Staticall
 
     /**
      * Creates a FooStaticall Class file.
-     *
-     * For use with eval() or write to a file.
      *
      * @param string $class
      * @return string
