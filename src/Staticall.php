@@ -120,7 +120,7 @@ abstract class Staticall
 
 
     /**
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public static function __callStatic($method, $arguments)
     {
@@ -128,12 +128,12 @@ abstract class Staticall
         $class = static::$fqcns[$fqcn];
         $id = static::$staticalls[$class];
 
-        if (static::$container->has($id)) {
-            $instance = static::$container[$id];
-            return call_user_func_array([$instance, $method], $arguments);
-        } else {
-            throw new \RuntimeException("Staticall {$class}::{$method} fail. Not found the corresponded service.");
+        if (!static::$container->has($id)) {
+            throw new \Exception("Staticall {$class}::{$method} fail. Not found the corresponded service.");
         }
+
+        $instance = static::$container[$id];
+        return call_user_func_array([$instance, $method], $arguments);
     }
 
 
