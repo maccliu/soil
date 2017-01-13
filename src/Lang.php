@@ -17,17 +17,19 @@ use Soil\Lang;
  */
 class Lang implements \ArrayAccess
 {
-    /* for read */
-    private $root = null;
-    private $rel = null;
-    private $source_lang = null;
-    private $target_lang = null;
+    /* main variables */
+    protected $root = null;
+    protected $rel = null;
+    protected $source_lang = null;
+    protected $target_lang = null;
+    protected $autosave = false;
+
+    /* dictionaries */
     private $source = [];
     private $target = [];
-    private $loaded = false;
 
-    /* for save */
-    private $autosave = false;
+    /* state variables */
+    private $loaded = false;
     private $source_changed = false;
     private $target_changed = false;
 
@@ -151,16 +153,16 @@ class Lang implements \ArrayAccess
 
 
     /**
-     * Loads a lang file to the specified array.
+     * Loads a lang file to the specified dictionary.
      *
      * @param string $lang
-     * @param array  $array
+     * @param array  $dict
      *
      * @return bool
      */
-    private function loadLang($lang, &$array)
+    private function loadLang($lang, &$dict)
     {
-        $array = [];
+        $dict = [];
 
         $root = $this->root;
         $rel = $this->rel;
@@ -176,7 +178,7 @@ class Lang implements \ArrayAccess
 
         $result = require($path);
         if (is_array($result)) {
-            $array = $result;
+            $dict = $result;
             return true;
         } else {
             return false;
@@ -186,11 +188,11 @@ class Lang implements \ArrayAccess
 
     /**
      * @param string  $lang
-     * @param array   $array
+     * @param array   $dict
      *
      * @return bool
      */
-    private function saveLang($lang, &$array)
+    private function saveLang($lang, &$dict)
     {
         $root = $this->root;
         $rel = $this->rel;
@@ -210,7 +212,7 @@ class Lang implements \ArrayAccess
 
         $path = "$dir/{$lang}.php";
 
-        $var = var_export($array, true);
+        $var = var_export($dict, true);
         $content = <<<EOF
 <?php
 return $var;
