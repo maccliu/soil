@@ -11,68 +11,60 @@ namespace Soil;
 /**
  * Loader
  *
+ * Loads a FQCN (Fully-Qualified Class Name), like 'your\\class\\name'.
+ * Loads a Class Alias.
+ *
  * @author Macc Liu <mail@maccliu.com>
  */
 class Loader
 {
-    private $_registered = false;   // 只可spl_autoload_register一次
-    private $_namespaces = [];      // 名称空间列表
-    private $_aliases = [];         // 别名列表
-    private $_queue = [];           // 所有登记的队列
+    private $_namespaces = [];      // namespace dictionary
+    private $_aliases = [];         // alias dictionary
+    private $_queue = [];
 
     const NAMESPACE_TYPE = 'namespace';
     const ALIAS_TYPE = 'alias';
 
 
-    /**
-     * 把$this->login()注册到spl_autoload
-     *
-     * @return bool
-     */
-    public function register()
+    public function __construct()
     {
-        if ($this->_registered) {
-            return true;
-        }
-
-        $this->_registered = spl_autoload_register([$this, 'autoload']);
-        return $this->_registered;
+        spl_autoload_register([$this, 'autoload']);
     }
 
 
     /**
-     * 尝试load一个类
      *
-     * @param string $class  FQCN的类名（'your\\class\\name'）
+     * @param string $class  The class name to load
      *
      * @return bool
      */
     protected function autoload($class)
     {
-        foreach ($this->_queue as $record) {
-            switch ($record['type']) {
+        foreach ($this->_queue as $item) {
+            switch ($item['type']) {
                 case self::NAMESPACE_TYPE:
-                    $result = $this->loadNamespace($class, $record['namespace'], $record['directory']);
+                    $result = $this->loadNamespace($class, $item['namespace'], $item['directory']);
                     if ($result) {
                         return true;
                     }
                     break;
 
                 case self::ALIAS_TYPE:
-                    $result = $this->loadAlias($class, $record['alias'], $record['real']);
+                    $result = $this->loadAlias($class, $item['alias'], $item['real']);
                     if ($result) {
                         return true;
                     }
                     break;
             }
         }
+        return false;
     }
 
 
     /**
-     * 在某个namespace下能否找到对应的class
+     * Try to load a class under the specified namespace.
      *
-     * @param string $class     FQCN的类名
+     * @param string $class     FQCN
      * @param string $namespace
      * @param string $directory
      *
@@ -80,31 +72,30 @@ class Loader
      */
     private function loadNamespace($class, $namespace, $directory)
     {
-        // 检查class是否包含指定的namespace
+        // under the namespace?
         $len = strlen($namespace);
         if (strncmp($class, $namespace, $len) !== 0) {
             return false;
         }
 
-        // 检查对应的目录是否存在
         if (!file_exists($directory) || !is_dir($directory)) {
             return false;
         }
 
-        // 去除class中的namespace部分
-        $cls = substr($class, $len);
+        // remove the namepsace part
+        $cls = substr($class, $len+1);
 
-        // 检查目标php文件是否存在
+        // check the class file exists
         $dir = realpath($directory);
-        $target = "{$dir}{$cls}.php";
+        $target = "{$dir}/{$cls}.php";
         if (!file_exists($target) || !is_file($target)) {
             return false;
         }
 
-        // 引入目标文件
+        // require the target class file.
         require($target);
 
-        // 引入后，检查class是否有了
+        // check the result
         if (class_exists($class)) {
             return true;
         } else {
@@ -114,7 +105,7 @@ class Loader
 
 
     /**
-     * 尝试class是不是一个已设置的alias
+     * Try to load a class alias.
      *
      * @param string $class A FQCN classname
      * @param string $alias A FQCN classname
@@ -131,7 +122,7 @@ class Loader
 
 
     /**
-     * 映射一个名称空间到其对应的目录
+     * Add a namespace.
      *
      * @param string $namespace  'your\\namespace'
      * @param string $directory  '/your/namespace/root/directory'
@@ -140,7 +131,7 @@ class Loader
      */
     public function addNamespace($namespace, $directory)
     {
-        // 先去除$namespace前后的'\'以及空白字符
+        // normalize
         $namespace = trim($namespace, "\\ \t\n\r\0\x0B");
 
         $this->_namespaces[$namespace] = $directory;
@@ -156,15 +147,15 @@ class Loader
 
 
     /**
-     * 把一个类的别名指向到其真实类名
+     * Add a class alias.
      *
-     * @param string $alias  类的别名
-     * @param string $real   包含名称空间的真实类名
+     * @param string $alias  The class alias
+     * @param string $real   Real FQCN
      */
     public function addAlias($alias, $real)
     {
         if (array_key_exists($alias, $this->_aliases)) {
-            throw new Exception('已经声明过的类别名，不可再次重复声明');
+            throw new \Exception('Duplicated class alias.');
         }
 
         $this->_aliases[$alias] = $real;
