@@ -62,19 +62,6 @@ class RouteRule
 
 
     /**
-     * Matches a subject.
-     *
-     * @param string  $subject
-     *
-     * @return bool
-     */
-    public function match($subject)
-    {
-        return false;
-    }
-
-
-    /**
      * Splits a rule into a token array.
      *
      * @param string  $rule rule to split
@@ -128,5 +115,77 @@ class RouteRule
         }
 
         return $return;
+    }
+
+
+    /**
+     * Matches a subject.
+     *
+     * @param string  $subject
+     *
+     * @return bool
+     */
+    public function match($subject, &$matches)
+    {
+        $preg_delimter = '/';
+
+        $rule_parts = $this->tokenize($this->rule);
+        if ($rule_parts === null) {
+            return null;
+        }
+
+        $vartable = []; // $vartable['{foo}'] => $var1
+
+        $patterns = [];
+        $patterns[] = '^';
+
+        foreach ($rule_parts as $id => $part) {
+            list($type, $token) = $part;
+
+            switch ($type) {
+                case self::TOKEN_TEXT:
+                    $patterns[] = preg_quote($token, $preg_delimter);
+                    break;
+
+                case self::TOKEN_VAR:
+                    /*
+                     * If $vartable[$text] defined, just add a backward-reference,
+                     * Or creates a new var entry.
+                     */
+                    if (array_key_exists($token, $vartable)) {
+                        $pattern[] = '(\\k<' . $vartable[$token] . '>)';
+                    } else {
+                        $vartable[$token] = 'var' . $id;
+                        if ($rule_vars === null || !isset($rule_vars[$token])) {
+                            $p = '[^' . preg_quote($terminate_chars, $preg_delimter) . ']+';
+                        } else {
+                            $p = $rule_vars[$token];
+                        }
+                        $patterns[] = '(?<' . $vartable[$token] . '>' . $p . ')';
+                    }
+                    break;
+            }
+        }
+
+        $patterns = $preg_delimter . implode('', $patterns) . $preg_delimter;
+        if ($ignore_case) {
+            $patterns = $patterns . 'i';  // Case-insensitive
+        }
+
+        // Executes the preg_match_all, returns the result.
+        $submatches = [];
+        $result = preg_match($patterns, $subject, $submatches);
+
+        // If matched, puts the variables value into $matches
+        if ($result) {
+            $matches[0] = $submatches[0];
+            $matches[-1] = substr($subject, strlen($matches[0]));
+            foreach ($vartable as $token => $var) {
+                $matches[$token] = $submatches[$var];
+            }
+        }
+
+        // Done!
+        return $result;
     }
 }
