@@ -9,7 +9,7 @@
 namespace Soil\Loader;
 
 /**
- * AliasLoaderInterface
+ * AliasLoader Interface
  *
  * @author Macc Liu <mail@maccliu.com>
  */
