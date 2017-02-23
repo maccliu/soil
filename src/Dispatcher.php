@@ -15,9 +15,6 @@ namespace Soil;
  */
 class Dispatcher
 {
-    const before = 'before';
-    const after = 'after';
-
     protected $jobs = [];
     protected $hooks = [];
 
@@ -54,6 +51,13 @@ class Dispatcher
     }
 
 
+    /**
+     * 在指定的job前或job后挂载一个回调函数
+     *
+     * @param string $job        job名称
+     * @param string $position   位置（可为before或者after）
+     * @param callback $callback 要加载的回调函数
+     */
     public function hook($job, $position, $callback)
     {
         $this->hooks[$job][$position][] = $callback;
