@@ -19,6 +19,12 @@ class Dispatcher
     protected $hooks = [];
 
 
+    public function __construct()
+    {
+        init();
+    }
+
+
     public function init()
     {
         $this->jobs = [];
@@ -76,15 +82,15 @@ class Dispatcher
 
         // 处理任务前置队列
         if (!isset($this->hooks[$job]['before'])) {
-            $this->processHooks($this->hooks[$job]['before'], $params, $output);
+            self::processHooks($this->hooks[$job]['before'], $params, $output);
         }
 
         // 处理任务
-        $output = $this->process($this->get($job), $params);
+        $output = self::process($this->get($job), $params);
 
         // 处理任务后置队列
         if (!isset($this->hooks[$job]['after'])) {
-            $this->processHooks($this->hooks[$job]['after'], $params, $output);
+            self::processHooks($this->hooks[$job]['after'], $params, $output);
         }
 
         // 输出结果
@@ -105,15 +111,15 @@ class Dispatcher
             if (is_array($callback)) {
                 list($class, $method) = $callback;
                 if (is_object($class)) {
-                    return self::invokeMethod($callback, $params);
+                    return self::invokeMethod($class, $method, $params);
                 } else {
-                    return self::invokeStaticMethod($callback, $params);
+                    return self::invokeStaticMethod($class, $method, $params);
                 }
             } else {
                 return self::callFunction($callback, $params);
             }
         } else {
-            throw new \Exception('指定了不合法的回调函数');
+            throw new \Exception('指定了非法的回调函数');
         }
     }
 
@@ -133,6 +139,66 @@ class Dispatcher
             if ($continue === false) {
                 break;
             }
+        }
+    }
+
+
+    /**
+     * 调用指定对象的指定方法
+     *
+     * @param array $callback
+     * @param array $params
+     * @throws \Exception
+     */
+    public static function invokeMethod($class, $method, array &$params = [])
+    {
+        switch (count($params)) {
+            case 0:
+                return $class->$method();
+            case 1:
+                return $class->$method($params[0]);
+            case 2:
+                return $class->$method($params[0], $params[1]);
+            case 3:
+                return $class->$method($params[0], $params[1], $params[2]);
+            case 4:
+                return $class->$method($params[0], $params[1], $params[2], $params[3]);
+            case 5:
+                return $class->$method($params[0], $params[1], $params[2], $params[3], $params[4]);
+            case 6:
+                return $class->$method($params[0], $params[1], $params[2], $params[3], $params[4], $params[5]);
+            default:
+                return call_user_func_array(array($class, $method), $params);
+        }
+    }
+
+
+    /**
+     * 调用指定类的静态方法
+     *
+     * @param array $callback
+     * @param array $params
+     * @throws \Exception
+     */
+    public static function invokeStaticMethod($class, $method, array &$params = [])
+    {
+        switch (count($params)) {
+            case 0:
+                return $class::$method();
+            case 1:
+                return $class::$method($params[0]);
+            case 2:
+                return $class::$method($params[0], $params[1]);
+            case 3:
+                return $class::$method($params[0], $params[1], $params[2]);
+            case 4:
+                return $class::$method($params[0], $params[1], $params[2], $params[3]);
+            case 5:
+                return $class::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
+            case 6:
+                return $class::$method($params[0], $params[1], $params[2], $params[3], $params[4], $params[5]);
+            default:
+                return call_user_func_array(array($class, $method), $params);
         }
     }
 
@@ -164,70 +230,6 @@ class Dispatcher
                 return $callback($params[0], $params[1], $params[2], $params[3], $params[4]);
             case 6:
                 return $callback($params[0], $params[1], $params[2], $params[3], $params[4], $params[5]);
-            default:
-                return call_user_func_array($callback, $params);
-        }
-    }
-
-
-    /**
-     * 调用指定对象的指定方法
-     *
-     * @param array $callback
-     * @param array $params
-     * @throws \Exception
-     */
-    public static function invokeMethod(array $callback, array &$params = [])
-    {
-        list($class, $method) = $callback;
-
-        switch (count($params)) {
-            case 0:
-                return $class->$method();
-            case 1:
-                return $class->$method($params[0]);
-            case 2:
-                return $class->$method($params[0], $params[1]);
-            case 3:
-                return $class->$method($params[0], $params[1], $params[2]);
-            case 4:
-                return $class->$method($params[0], $params[1], $params[2], $params[3]);
-            case 5:
-                return $class->$method($params[0], $params[1], $params[2], $params[3], $params[4]);
-            case 6:
-                return $class->$method($params[0], $params[1], $params[2], $params[3], $params[4], $params[5]);
-            default:
-                return call_user_func_array($callback, $params);
-        }
-    }
-
-
-    /**
-     * 调用指定类的静态方法
-     *
-     * @param array $callback
-     * @param array $params
-     * @throws \Exception
-     */
-    public static function invokeStaticMethod(array $callback, array &$params = [])
-    {
-        list($class, $method) = $callback;
-
-        switch (count($params)) {
-            case 0:
-                return $class::$method();
-            case 1:
-                return $class::$method($params[0]);
-            case 2:
-                return $class::$method($params[0], $params[1]);
-            case 3:
-                return $class::$method($params[0], $params[1], $params[2]);
-            case 4:
-                return $class::$method($params[0], $params[1], $params[2], $params[3]);
-            case 5:
-                return $class::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
-            case 6:
-                return $class::$method($params[0], $params[1], $params[2], $params[3], $params[4], $params[5]);
             default:
                 return call_user_func_array($callback, $params);
         }
